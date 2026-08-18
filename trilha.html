@@ -43,14 +43,20 @@
   .ui-navy{color:var(--navy);}
   .page-loader{position:fixed;inset:0;z-index:240;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .32s ease,visibility .32s ease;}
   body.page-loaded .page-loader{opacity:0;visibility:hidden;pointer-events:none;}
-  .loader-atom{width:56px;height:56px;overflow:visible;}
-  .loader-atom .orbit{fill:none;stroke-linecap:round;stroke-width:5;transform-origin:50px 50px;}
-  .loader-atom .orbit-orange{stroke:#E87722;animation:atomSpin 1.15s linear infinite;}
-  .loader-atom .orbit-navy{stroke:#1C4B82;animation:atomSpinReverse 1.45s linear infinite;}
-  .loader-atom .core{fill:#1A1A1A;animation:atomPulse 1.15s ease-in-out infinite;}
-  @keyframes atomSpin{to{transform:rotate(360deg);}}
-  @keyframes atomSpinReverse{to{transform:rotate(-360deg);}}
-  @keyframes atomPulse{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.18);opacity:1;}}
+  .lector-spinner{--size:56px;--blade-width:calc(var(--size)*.06);position:relative;width:var(--size);height:var(--size);transform:rotateZ(45deg);perspective:1000px;}
+  .ls-blade{position:absolute;inset:0;border-radius:50%;animation:lsSpin 1s linear infinite;}
+  .ls-blade-a{color:var(--orange);transform:rotateX(70deg);}
+  .ls-blade-b{color:var(--navy);transform:rotateY(70deg);animation-delay:.4s;}
+  @keyframes lsSpin{
+    0%,100%{box-shadow:var(--blade-width) 0 0 0 currentcolor;}
+    12%{box-shadow:var(--blade-width) var(--blade-width) 0 0 currentcolor;}
+    25%{box-shadow:0 var(--blade-width) 0 0 currentcolor;}
+    37%{box-shadow:calc(var(--blade-width) * -1) var(--blade-width) 0 0 currentcolor;}
+    50%{box-shadow:calc(var(--blade-width) * -1) 0 0 0 currentcolor;}
+    62%{box-shadow:calc(var(--blade-width) * -1) calc(var(--blade-width) * -1) 0 0 currentcolor;}
+    75%{box-shadow:0 calc(var(--blade-width) * -1) 0 0 currentcolor;}
+    87%{box-shadow:var(--blade-width) calc(var(--blade-width) * -1) 0 0 currentcolor;}
+  }
   .app{display:flex;height:100vh;overflow:hidden;}
   body.sidebar-collapsed .side{display:none;}
 
@@ -234,7 +240,7 @@
   .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;min-width:0;}
   .bar{width:62%;max-width:54px;background:var(--orange);border-radius:4px 4px 0 0;transition:height .55s cubic-bezier(.2,.7,.2,1),background .12s;cursor:pointer;}
   .bar-col:hover .bar{background:var(--orange-dark);}
-  .bar-col .blabel{position:absolute;bottom:-24px;font-size:11px;color:var(--muted);font-weight:500;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-col .blabel{position:absolute;bottom:-24px;font-size:13px;color:var(--muted);font-weight:500;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .bar-col .bval{position:absolute;top:-22px;font-size:12px;font-weight:700;color:var(--orange-dark);opacity:0;transition:opacity .12s;}
   .bar-col:hover .bval{opacity:1;}
 
@@ -389,7 +395,7 @@
     .trail-copy h2{font-size:17px;}
     .tabs{top:52px;}
     .plot-scroll{padding-bottom:2px;}
-    .bar-col .blabel{font-size:10px;}
+    .bar-col .blabel{font-size:12px;}
     .reader-back{height:34px;font-size:12px;padding:0 14px 0 12px;}
     .reader-video-wrap{padding:12px;background:#111;}
     .reader-video{max-height:calc(100vh - 72px);}
@@ -410,11 +416,10 @@
 </head>
 <body>
 <div class="page-loader" id="pageLoader" role="status" aria-label="Carregando">
-  <svg class="loader-atom" viewBox="0 0 100 100" aria-hidden="true">
-    <ellipse class="orbit orbit-orange" cx="50" cy="50" rx="34" ry="12" transform="rotate(26 50 50)"/>
-    <ellipse class="orbit orbit-navy" cx="50" cy="50" rx="34" ry="12" transform="rotate(-55 50 50)"/>
-    <circle class="core" cx="50" cy="50" r="5"/>
-  </svg>
+  <div class="lector-spinner">
+    <span class="ls-blade ls-blade-a"></span>
+    <span class="ls-blade ls-blade-b"></span>
+  </div>
 </div>
 <div class="app">
 
@@ -585,8 +590,6 @@
     <div class="topbar">
       <button id="hideResource" ng-if="!showFinishtrail()" ng-click="hideResource()" class="btn-accent icon-undo center middle ng-scope" title="Voltar" aria-label="Voltar"></button>
       <nav class="crumbs">
-        <a>Vitrine</a><span class="sep">›</span>
-        <a>Teste Automação</a><span class="sep">›</span>
         <a>Minha Área</a><span class="sep">›</span>
         <a>Minhas Trilhas</a><span class="sep">›</span>
         <span class="cur">Conteúdo 2</span>
@@ -595,8 +598,6 @@
 
     <div class="scroll">
       <nav class="mobile-crumbs" aria-label="Caminho de navegação">
-        <a>Vitrine</a><span class="sep">›</span>
-        <a>Nome da Vitrine</a><span class="sep">›</span>
         <a>Minha Área</a><span class="sep">›</span>
         <a>Minhas Trilhas</a><span class="sep">›</span>
         <span class="cur">Nome Trilha</span>
@@ -850,7 +851,13 @@
   };
   const SCROLL_AFTER = 10;   // > 10 conteúdos => scroll horizontal
   const COL_WIDTH = 84;      // px por coluna quando há scroll
+  const LABEL_MAX_CHARS = 14;
   let currentKey = 'e2';
+
+  function truncateLabel(text){
+    if(!text) return '';
+    return text.length > LABEL_MAX_CHARS ? text.slice(0, LABEL_MAX_CHARS).trimEnd()+'...' : text;
+  }
 
   function getItems(key){
     const out = [];
@@ -872,7 +879,7 @@
       const target = it.v===0 ? '1.5%' : it.v+'%';
       return '<div class="bar-col"><span class="bval">'+it.v+'%</span>'
            + '<div class="bar" data-target="'+target+'" style="height:0%"></div>'
-           + '<span class="blabel">'+it.label+'</span></div>';
+           + '<span class="blabel" title="'+it.label+'">'+truncateLabel(it.label)+'</span></div>';
     }).join('');
 
     // scroll when many contents

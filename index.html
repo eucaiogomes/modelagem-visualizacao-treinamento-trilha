@@ -43,14 +43,20 @@
   .ui-navy{color:var(--navy);}
   .page-loader{position:fixed;inset:0;z-index:240;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .32s ease,visibility .32s ease;}
   body.page-loaded .page-loader{opacity:0;visibility:hidden;pointer-events:none;}
-  .loader-atom{width:56px;height:56px;overflow:visible;}
-  .loader-atom .orbit{fill:none;stroke-linecap:round;stroke-width:5;transform-origin:50px 50px;}
-  .loader-atom .orbit-orange{stroke:#E87722;animation:atomSpin 1.15s linear infinite;}
-  .loader-atom .orbit-navy{stroke:#1C4B82;animation:atomSpinReverse 1.45s linear infinite;}
-  .loader-atom .core{fill:#1A1A1A;animation:atomPulse 1.15s ease-in-out infinite;}
-  @keyframes atomSpin{to{transform:rotate(360deg);}}
-  @keyframes atomSpinReverse{to{transform:rotate(-360deg);}}
-  @keyframes atomPulse{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.18);opacity:1;}}
+  .lector-spinner{--size:56px;--blade-width:calc(var(--size)*.06);position:relative;width:var(--size);height:var(--size);transform:rotateZ(45deg);perspective:1000px;}
+  .ls-blade{position:absolute;inset:0;border-radius:50%;animation:lsSpin 1s linear infinite;}
+  .ls-blade-a{color:var(--orange);transform:rotateX(70deg);}
+  .ls-blade-b{color:var(--navy);transform:rotateY(70deg);animation-delay:.4s;}
+  @keyframes lsSpin{
+    0%,100%{box-shadow:var(--blade-width) 0 0 0 currentcolor;}
+    12%{box-shadow:var(--blade-width) var(--blade-width) 0 0 currentcolor;}
+    25%{box-shadow:0 var(--blade-width) 0 0 currentcolor;}
+    37%{box-shadow:calc(var(--blade-width) * -1) var(--blade-width) 0 0 currentcolor;}
+    50%{box-shadow:calc(var(--blade-width) * -1) 0 0 0 currentcolor;}
+    62%{box-shadow:calc(var(--blade-width) * -1) calc(var(--blade-width) * -1) 0 0 currentcolor;}
+    75%{box-shadow:0 calc(var(--blade-width) * -1) 0 0 currentcolor;}
+    87%{box-shadow:var(--blade-width) calc(var(--blade-width) * -1) 0 0 currentcolor;}
+  }
   .app{display:flex;height:100vh;overflow:hidden;}
   body.sidebar-collapsed .side{display:none;}
 
@@ -140,7 +146,7 @@
   .btn-accent.center.middle{align-items:center;justify-content:center;}
   .btn-accent[class*=" icon-"]:before{width:auto;margin:0;font-size:18px;line-height:1;}
   .crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap;min-width:0;}
-  .crumbs .sep{color:var(--n400);}
+  .crumbs .sep{color:var(--n400);font-size:16px;line-height:1;}
   .crumbs a{color:var(--muted);text-decoration:none;cursor:pointer;}
   .crumbs a:hover{color:var(--orange);}
   .crumbs .cur{color:var(--orange);font-weight:600;}
@@ -231,29 +237,147 @@
   .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;min-width:0;}
   .bar{width:62%;max-width:54px;background:var(--orange);border-radius:4px 4px 0 0;transition:height .55s cubic-bezier(.2,.7,.2,1),background .12s;cursor:pointer;}
   .bar-col:hover .bar{background:var(--orange-dark);}
-  .bar-col .blabel{position:absolute;bottom:-24px;font-size:11px;color:var(--muted);font-weight:500;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-col .blabel{position:absolute;bottom:-24px;font-size:13px;color:var(--muted);font-weight:500;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .bar-col .bval{position:absolute;top:-22px;font-size:12px;font-weight:700;color:var(--orange-dark);opacity:0;transition:opacity .12s;}
   .bar-col:hover .bval{opacity:1;}
 
-  /* Descrição */
+  /* Descrição / Resumo / Fóruns */
   .desc{max-width:680px;}
   .desc p{font-size:14px;line-height:1.6;color:var(--n700);margin:0 0 14px;}
 
-  /* Relatórios */
-  .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
-  .tool{width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s;box-shadow:0 2px 5px rgba(232,119,34,.28);}
-  .tool:hover{background:var(--orange-dark);}
-  .tool .ui-icon{font-size:18px;}
-  table{width:100%;border-collapse:collapse;font-size:13px;}
-  th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);padding:12px 14px;border-bottom:2px solid var(--n300);}
-  th .sort{color:var(--orange);margin-left:4px;}
-  td{padding:14px;border-bottom:1px solid var(--n200);color:var(--n700);vertical-align:middle;}
-  tr:hover td{background:var(--n50);}
-  td.a-good{color:var(--success);font-weight:600;}
-  td.a-zero{color:var(--n500);}
-  .ct-inline{display:flex;align-items:center;gap:10px;}
-  .ct-inline a{color:var(--orange);text-decoration:none;}
-  .ct-inline a:hover{text-decoration:underline;}
+  /* Material Complementar */
+  .material-wrap{display:flex;flex-direction:column;gap:16px;}
+  .material-folders{border:1px solid var(--n300);border-radius:var(--r-md);background:#fff;overflow:hidden;}
+  .material-folders-head{padding:12px 14px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--n200);}
+  .material-folder{display:flex;align-items:center;gap:10px;padding:12px 14px;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;border-bottom:1px solid var(--n100);transition:background .1s;}
+  .material-folder:last-child{border-bottom:none;}
+  .material-folder:hover{background:var(--n50);}
+  .material-folder .ui-icon{color:var(--sub);font-size:15px;}
+  .material-folder .chev{margin-left:auto;font-size:12px;color:var(--n400);}
+  .material-folder.active{background:var(--orange-subtle);color:var(--orange-dark);border-left:3px solid var(--orange);padding-left:11px;}
+  .material-folder.active .ui-icon{color:var(--orange);}
+  .material-main-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:14px;}
+  .material-main-head b{color:var(--orange-dark);}
+  .material-count{font-size:11px;font-weight:700;color:var(--sub);}
+  .material-files{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .material-file{border:1px solid var(--n300);border-radius:var(--r-md);padding:16px;background:#fff;box-shadow:var(--shadow-sm);}
+  .mf-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .mf-type{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--orange);}
+  .mf-size{font-size:11px;color:var(--sub);}
+  .mf-name{font-size:13px;font-weight:700;color:var(--ink);margin-top:10px;line-height:1.35;}
+  .mf-download{margin-top:14px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--orange-dark);background:var(--orange-subtle);border:1px solid #f0c79a;border-radius:var(--r-sm);padding:9px 12px;cursor:pointer;transition:background .12s;}
+  .mf-download:hover{background:#f7dfc4;}
+
+  /* Sobre o Autor */
+  .author-row{display:flex;align-items:center;gap:18px;}
+  .author-avatar{width:72px;height:72px;flex:none;border-radius:50%;background:var(--n200);color:var(--n500);display:flex;align-items:center;justify-content:center;}
+  .author-avatar .ui-icon{font-size:34px;}
+  .author-info h3{margin:0;font-size:18px;font-weight:700;color:var(--ink);}
+
+  /* Tutores */
+  .tutores-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .tutor-card{background:#fff;border:1px solid var(--n300);border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:20px 18px;text-align:center;}
+  .tutor-avatar{width:64px;height:64px;margin:0 auto 12px;border-radius:50%;background:var(--n200);color:var(--n500);display:flex;align-items:center;justify-content:center;position:relative;}
+  .tutor-avatar .ui-icon{font-size:28px;}
+  .tutor-avatar::after{content:'';position:absolute;right:2px;bottom:2px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;background:var(--n400);}
+  .tutor-avatar.online::after{background:var(--green);}
+  .tutor-name{font-size:14px;font-weight:700;color:var(--ink);}
+  .tutor-role{font-size:12px;color:var(--muted);margin-top:2px;}
+  .tutor-btn{margin-top:14px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--orange-dark);background:var(--orange-subtle);border:1px solid #f0c79a;border-radius:var(--r-sm);padding:9px 12px;cursor:pointer;transition:background .12s;}
+  .tutor-btn:hover{background:#f7dfc4;}
+
+  /* Sugestões */
+  .sugestoes-title{margin:0 0 16px;font-size:18px;font-weight:700;color:var(--navy);}
+  .sugestoes-group{margin-bottom:20px;}
+  .sugestoes-label{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);}
+
+  /* Fóruns */
+  .forum-compose{background:#fff;border:1px solid var(--n300);border-radius:12px;box-shadow:var(--shadow-sm);padding:16px 18px;}
+  .forum-compose-top{display:flex;align-items:center;gap:12px;}
+  .forum-avatar{width:40px;height:40px;flex:none;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .forum-input{flex:1;min-width:0;border:1px solid var(--n300);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--n50);}
+  .forum-input::placeholder{color:var(--sub);}
+  .forum-input:focus{outline:none;border-color:var(--orange);background:#fff;}
+  .forum-compose-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--n200);}
+  .forum-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .forum-action{display:inline-flex;align-items:center;gap:6px;background:none;border:0;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;padding:0;}
+  .forum-action:hover{color:var(--ink);}
+  .forum-action .ui-icon{font-size:15px;color:var(--sub);}
+  .forum-publish{border:0;border-radius:999px;padding:10px 26px;font-family:var(--sans);font-size:13px;font-weight:700;color:#fff;background:var(--orange);cursor:pointer;transition:.15s;}
+  .forum-publish:hover:not(:disabled){background:var(--orange-dark);}
+  .forum-publish:disabled{opacity:.45;cursor:default;}
+  .forum-image-preview{display:none;position:relative;margin-top:12px;border-radius:10px;overflow:hidden;border:1px solid var(--n300);max-width:220px;}
+  .forum-image-preview.show{display:block;}
+  .forum-image-preview img{display:block;width:100%;max-height:160px;object-fit:cover;}
+  .forum-image-remove{position:absolute;top:6px;right:6px;width:24px;height:24px;border:0;border-radius:50%;background:rgba(26,26,26,.55);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+  .forum-image-remove:hover{background:rgba(26,26,26,.75);}
+  .forum-image-remove .ui-icon{font-size:13px;}
+
+  /* Fórum: feed de publicações */
+  .forum-feed{display:flex;flex-direction:column;gap:14px;margin-top:16px;}
+  .forum-post{background:#fff;border:1px solid var(--n300);border-radius:12px;box-shadow:var(--shadow-sm);padding:16px 18px;}
+  .forum-post-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .forum-post-avatar{width:38px;height:38px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;}
+  .forum-post-name{font-size:13px;font-weight:700;color:var(--ink);}
+  .forum-post-date{font-size:11px;color:var(--sub);margin-top:1px;}
+  .forum-post-text{font-size:13px;line-height:1.55;color:var(--n700);white-space:pre-wrap;}
+  .forum-post-image{margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid var(--n200);}
+  .forum-post-image img{display:block;width:100%;max-height:220px;object-fit:cover;}
+  .forum-feed-empty{font-size:13px;color:var(--sub);text-align:center;padding:20px 0;}
+  .forum-pubs-head{display:flex;align-items:center;gap:10px;margin:22px 0 14px;font-size:15px;font-weight:700;color:var(--ink);}
+  .forum-pubs-bar{width:4px;height:18px;border-radius:2px;background:var(--orange);flex:none;}
+  .forum-filters{display:flex;gap:10px;flex-wrap:wrap;}
+  .forum-search{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;border:1px solid var(--n300);border-radius:999px;padding:9px 16px;background:#fff;}
+  .forum-search .ui-icon{font-size:14px;color:var(--sub);}
+  .forum-search input{flex:1;min-width:0;border:0;outline:0;font-family:var(--sans);font-size:13px;color:var(--ink);background:transparent;}
+  .forum-search input::placeholder{color:var(--sub);}
+  .forum-datefilter-wrap{position:relative;}
+  .forum-datefilter{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--n300);border-radius:999px;padding:9px 16px;background:#fff;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;white-space:nowrap;}
+  .forum-datefilter .chev{font-size:11px;color:var(--n400);margin-left:2px;}
+  .forum-datefilter.open{border-color:var(--orange);color:var(--orange-dark);}
+  .forum-datefilter.open .ui-icon{color:var(--orange-dark);}
+  .forum-datefilter.filled{border-color:var(--orange);color:var(--orange-dark);}
+  .forum-datefilter.filled .ui-icon{color:var(--orange-dark);}
+
+  /* Filtro por data — popover + calendário */
+  .forum-date-popover{display:none;position:absolute;top:calc(100% + 8px);right:0;width:264px;max-width:calc(100vw - 40px);background:#fff;border:1px solid var(--n300);border-radius:12px;box-shadow:var(--shadow-md);padding:16px;z-index:40;}
+  .forum-date-popover.open{display:block;}
+  .fdp-title{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;}
+  .fdp-field{margin-bottom:14px;position:relative;}
+  .fdp-field label{display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .fdp-input{border:1px solid var(--n300);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--sub);cursor:pointer;background:#fff;transition:.12s;}
+  .fdp-input.filled{color:var(--ink);}
+  .fdp-input.open{border-color:var(--orange);}
+  .fdp-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:2px;}
+  .fdp-cancel{border:1px solid var(--n300);border-radius:8px;background:#fff;color:var(--n700);font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;cursor:pointer;}
+  .fdp-cancel:hover{border-color:var(--n400);}
+  .fdp-confirm{border:0;border-radius:8px;background:var(--orange);color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 18px;cursor:pointer;}
+  .fdp-confirm:hover{background:var(--orange-dark);}
+  .fdp-calendar{display:none;position:absolute;top:calc(100% + 6px);left:0;width:100%;background:#fff;border:1px solid var(--n300);border-radius:10px;box-shadow:var(--shadow-md);padding:12px;z-index:50;}
+  .fdp-calendar.open{display:block;}
+  .fdp-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--ink);}
+  .fdp-cal-nav{width:22px;height:22px;border:0;background:none;color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;padding:0;}
+  .fdp-cal-nav:hover{background:var(--n100);color:var(--ink);}
+  .fdp-cal-nav .ui-icon{font-size:11px;}
+  .fdp-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .fdp-cal-dow{font-size:10px;font-weight:700;color:var(--sub);text-align:center;padding:4px 0;}
+  .fdp-cal-day{font-size:12px;text-align:center;padding:6px 0;border-radius:50%;cursor:pointer;color:var(--n700);}
+  .fdp-cal-day:hover{background:var(--n100);}
+  .fdp-cal-day.today{background:var(--orange-subtle);color:var(--orange-dark);font-weight:700;}
+  .fdp-cal-day.selected{background:var(--orange);color:#fff;font-weight:700;}
+  .fdp-cal-day.empty{cursor:default;}
+  .fdp-cal-day.empty:hover{background:none;}
+  .forum-carousel-wrap{margin-bottom:10px;}
+  .forum-carousel{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;}
+  .forum-carousel::-webkit-scrollbar{height:6px;}
+  .forum-carousel::-webkit-scrollbar-thumb{background:var(--n300);border-radius:99px;}
+  .forum-chip{flex:none;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--n300);border-radius:999px;background:#fff;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;white-space:nowrap;transition:.12s;}
+  .forum-chip:hover{border-color:var(--n400);}
+  .forum-chip .ui-icon{font-size:14px;color:var(--sub);}
+  .forum-chip.active{background:var(--orange-subtle);border-color:#f0c79a;color:var(--orange-dark);}
+  .forum-chip.active .ui-icon{color:var(--orange);}
+  .forum-active-label{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .forum-active-label b{color:var(--ink);font-weight:700;}
 
   /* Leitor de PDF */
   body.reader-open{overflow:hidden;background:#252525;}
@@ -275,6 +399,47 @@
   body.video-reader .reader-video-wrap{display:flex;}
   body.pdf-reader .reader-video-wrap{display:none;}
   body.pdf-reader .reader-frame{display:block;}
+
+  /* Chat com tutor */
+  .tutor-chat-screen{display:none;position:fixed;inset:0;z-index:100;background:#F2F2F7;flex-direction:column;}
+  body.tutor-chat-open .tutor-chat-screen{display:flex;}
+  body.tutor-chat-open .app{display:none;}
+  .tutor-chat-top{flex:none;height:56px;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;gap:10px;padding:0 8px 0 4px;}
+  .tutor-chat-back{width:38px;height:38px;border:0;border-radius:50%;background:transparent;color:var(--orange);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;}
+  .tutor-chat-back:hover{background:var(--n100);}
+  .tutor-chat-back .ui-icon{font-size:18px;}
+  .tutor-chat-avatar{width:36px;height:36px;border-radius:50%;flex:none;position:relative;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;background:var(--orange);}
+  .tutor-chat-avatar::after{content:'';position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid #fff;background:var(--n400);}
+  .tutor-chat-avatar.online::after{background:var(--green);}
+  .tutor-chat-who{flex:1;min-width:0;}
+  .tutor-chat-actions{display:flex;align-items:center;gap:2px;flex:none;}
+  .tutor-chat-iconbtn{width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--sub);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;}
+  .tutor-chat-iconbtn:hover{background:var(--n100);color:var(--muted);}
+  .tutor-chat-iconbtn .ui-icon{font-size:17px;}
+  .tutor-chat-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tutor-chat-status{font-size:11px;color:var(--sub);line-height:1.2;}
+  .tutor-chat-status.online{color:var(--green);}
+  .tutor-chat-messages{flex:1;overflow-y:auto;padding:14px 14px 6px;}
+  .tutor-chat-day{display:flex;justify-content:center;margin:2px 0 14px;}
+  .tutor-chat-day span{font-size:11px;color:var(--sub);background:#E4E4E9;padding:3px 10px;border-radius:99px;}
+  .tutor-chat-row{display:flex;margin-top:8px;}
+  .tutor-chat-row.own{justify-content:flex-end;}
+  .tutor-chat-bubble{max-width:78%;padding:9px 13px;border-radius:16px;}
+  .tutor-chat-row:not(.own) .tutor-chat-bubble{background:#fff;border-bottom-left-radius:5px;box-shadow:var(--shadow-sm);}
+  .tutor-chat-row.own .tutor-chat-bubble{background:var(--orange);border-bottom-right-radius:5px;}
+  .tutor-chat-text{font-size:14px;line-height:1.4;color:var(--ink);}
+  .tutor-chat-row.own .tutor-chat-text{color:#fff;}
+  .tutor-chat-time{font-size:10px;margin-top:3px;text-align:right;color:var(--sub);}
+  .tutor-chat-row.own .tutor-chat-time{color:rgba(255,255,255,.75);}
+  .tutor-chat-inputbar{flex:none;background:#fff;border-top:1px solid var(--n300);padding:10px 12px;display:flex;align-items:center;gap:8px;}
+  .tutor-chat-attach{width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--sub);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;}
+  .tutor-chat-attach:hover{background:var(--n100);color:var(--muted);}
+  .tutor-chat-input{flex:1;min-width:0;border:0;background:var(--n100);border-radius:999px;padding:9px 16px;font-family:var(--sans);font-size:14px;color:var(--ink);}
+  .tutor-chat-input:focus{outline:none;background:var(--n50);box-shadow:inset 0 0 0 1px var(--n300);}
+  .tutor-chat-send{width:36px;height:36px;border:0;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;}
+  .tutor-chat-send:hover{background:var(--orange-dark);}
+  .tutor-chat-send:disabled{opacity:.4;cursor:default;}
+  .tutor-chat-send .ui-icon{font-size:15px;}
 
   .certificate-overlay{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;padding-top:37px;}
   body.certificate-loading .certificate-overlay{display:flex;}
@@ -329,7 +494,7 @@
     .topbar .btn-accent,.crumbs{display:none;}
     .mobile-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin:12px 14px 0;font-size:12px;color:var(--muted);}
     .mobile-crumbs a{color:var(--muted);text-decoration:none;}
-    .mobile-crumbs .sep{color:var(--n400);}
+    .mobile-crumbs .sep{color:var(--n400);font-size:15px;line-height:1;}
     .mobile-crumbs .cur{color:var(--orange);font-weight:600;}
     .pagehead{display:none;}
     body.inline-pdf-open .pagehead,body.inline-video-open .pagehead{display:block;padding:10px 10px 0;}
@@ -339,8 +504,6 @@
     .tabs::-webkit-scrollbar{display:none;}
     .panel{padding:20px 24px 44px;}
     .chart-wrap{min-width:0;}
-    .panel[data-panel="relatorios"] .card{overflow-x:auto!important;}
-    table{min-width:720px;}
   }
 
   @media (max-width:760px){
@@ -385,7 +548,7 @@
     .trail-copy h2{font-size:17px;}
     .tabs{top:52px;}
     .plot-scroll{padding-bottom:2px;}
-    .bar-col .blabel{font-size:10px;}
+    .bar-col .blabel{font-size:12px;}
     .reader-back{height:34px;font-size:12px;padding:0 14px 0 12px;}
     .reader-video-wrap{padding:12px;background:#111;}
     .reader-video{max-height:calc(100vh - 72px);}
@@ -406,11 +569,10 @@
 </head>
 <body>
 <div class="page-loader" id="pageLoader" role="status" aria-label="Carregando">
-  <svg class="loader-atom" viewBox="0 0 100 100" aria-hidden="true">
-    <ellipse class="orbit orbit-orange" cx="50" cy="50" rx="34" ry="12" transform="rotate(26 50 50)"/>
-    <ellipse class="orbit orbit-navy" cx="50" cy="50" rx="34" ry="12" transform="rotate(-55 50 50)"/>
-    <circle class="core" cx="50" cy="50" r="5"/>
-  </svg>
+  <div class="lector-spinner">
+    <span class="ls-blade ls-blade-a"></span>
+    <span class="ls-blade ls-blade-b"></span>
+  </div>
 </div>
 <div class="app">
 
@@ -544,8 +706,6 @@
     <div class="topbar">
       <button id="hideResource" ng-if="!showFinishtrail()" ng-click="hideResource()" class="btn-accent icon-undo center middle ng-scope" title="Voltar" aria-label="Voltar"></button>
       <nav class="crumbs">
-        <a>Vitrine</a><span class="sep">›</span>
-        <a>Teste Automação</a><span class="sep">›</span>
         <a>Minha Área</a><span class="sep">›</span>
         <a>Meus Treinamentos</a><span class="sep">›</span>
         <span class="cur">Conteúdo 2</span>
@@ -554,8 +714,6 @@
 
     <div class="scroll">
       <nav class="mobile-crumbs" aria-label="Caminho de navegação">
-        <a>Vitrine</a><span class="sep">›</span>
-        <a>Nome da Vitrine</a><span class="sep">›</span>
         <a>Minha Área</a><span class="sep">›</span>
         <a>Meus Treinamentos</a><span class="sep">›</span>
         <span class="cur">Nome Treinamento</span>
@@ -587,9 +745,29 @@
       </div>
       <div class="tabs">
         <div class="tab" data-tab="descricao">Descrição</div>
+        <div class="tab" data-tab="resumo">Resumo</div>
         <div class="tab active" data-tab="desempenho">Desempenho</div>
-        <div class="tab" data-tab="relatorios">Relatórios</div>
+        <div class="tab" data-tab="material">Material Complementar</div>
+        <div class="tab" data-tab="autor">Sobre o Autor</div>
+        <div class="tab" data-tab="tutores">Tutores</div>
+        <div class="tab" data-tab="foruns">Fóruns</div>
+        <div class="tab" data-tab="sugestoes">Sugestões</div>
       </div>
+
+      <!-- ===== DESCRIÇÃO ===== -->
+      <section class="panel" data-panel="descricao">
+        <div class="desc">
+          <p>Descrição preenchida via Cypress.</p>
+          <p>Este conteúdo faz parte do <strong>Treinamento Skill Suporte Lector</strong>. Conclua o vídeo e os documentos de apoio para liberar a avaliação e avançar no treinamento.</p>
+        </div>
+      </section>
+
+      <!-- ===== RESUMO ===== -->
+      <section class="panel" data-panel="resumo">
+        <div class="desc">
+          <p><em>Resumo dos pontos principais abordados nesta lição.</em></p>
+        </div>
+      </section>
 
       <!-- ===== DESEMPENHO ===== -->
       <section class="panel show" data-panel="desempenho">
@@ -620,49 +798,161 @@
         </div>
       </section>
 
-      <!-- ===== DESCRIÇÃO ===== -->
-      <section class="panel" data-panel="descricao">
-        <div class="desc">
-          <p>Descrição preenchida via Cypress.</p>
-          <p>Este conteúdo faz parte do <strong>Treinamento Skill Suporte Lector</strong>. Conclua o vídeo e os documentos de apoio para liberar a avaliação e avançar no treinamento.</p>
+      <!-- ===== MATERIAL COMPLEMENTAR ===== -->
+      <section class="panel" data-panel="material">
+        <div class="material-wrap">
+          <div class="material-folders">
+            <div class="material-folders-head"><i class="ui-icon icon-folder ui-orange" aria-hidden="true"></i> Pastas disponíveis</div>
+            <div class="material-folder active" role="button" tabindex="0">
+              <i class="ui-icon icon-folder" aria-hidden="true"></i><span>Biblioteca teste</span><i class="ui-icon icon-right-open chev" aria-hidden="true"></i>
+            </div>
+            <div class="material-folder" role="button" tabindex="0">
+              <i class="ui-icon icon-folder" aria-hidden="true"></i><span>Material 2</span><i class="ui-icon icon-right-open chev" aria-hidden="true"></i>
+            </div>
+            <div class="material-folder" role="button" tabindex="0">
+              <i class="ui-icon icon-folder" aria-hidden="true"></i><span>Documentação Técnica</span><i class="ui-icon icon-right-open chev" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="material-main">
+            <div class="material-main-head">
+              <span>Conteúdo publicado: <b>Biblioteca teste</b></span>
+              <span class="material-count">2 arquivos</span>
+            </div>
+            <div class="material-files">
+              <div class="material-file">
+                <div class="mf-top"><span class="mf-type">PDF</span><span class="mf-size">692.12 KB</span></div>
+                <div class="mf-name">Capítulo 1 - Concepção e Desenvolvimento.pdf</div>
+                <button class="mf-download" type="button"><i class="ui-icon icon-download" aria-hidden="true"></i> Baixar arquivo</button>
+              </div>
+              <div class="material-file">
+                <div class="mf-top"><span class="mf-type">PDF</span><span class="mf-size">1.2 MB</span></div>
+                <div class="mf-name">Guia de Estilo Adotado.pdf</div>
+                <button class="mf-download" type="button"><i class="ui-icon icon-download" aria-hidden="true"></i> Baixar arquivo</button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- ===== RELATÓRIOS ===== -->
-      <section class="panel" data-panel="relatorios">
-        <div class="toolbar">
-          <div class="tool" title="Filtros"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
-          <div class="tool" title="Copiar"><i class="ui-icon icon-copy" aria-hidden="true"></i></div>
-          <div class="tool" title="Exportar Excel"><i class="ui-icon icon-file-xls" aria-hidden="true"></i></div>
-          <div class="tool" title="Exportar CSV"><i class="ui-icon icon-file-csv" aria-hidden="true"></i></div>
-          <div class="tool" title="Exportar PDF"><i class="ui-icon icon-pdf" aria-hidden="true"></i></div>
-          <div class="tool" title="Imprimir"><i class="ui-icon icon-printer" aria-hidden="true"></i></div>
+      <!-- ===== SOBRE O AUTOR ===== -->
+      <section class="panel" data-panel="autor">
+        <div class="author-row">
+          <div class="author-avatar"><i class="ui-icon icon-profile" aria-hidden="true"></i></div>
+          <div class="author-info">
+            <h3>Autor do Treinamento</h3>
+          </div>
         </div>
-        <div class="card" style="overflow:hidden;">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:55%">Conteúdo <span class="sort">▾</span></th>
-                <th>Aproveitamento</th>
-                <th>Carga horária</th>
-                <th>Data de conclusão</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><div class="ct-inline"><span>Conteúdo 1 — <a>Boas-vindas ao Suporte Lector</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 2 — <a>Visão geral da plataforma Lector</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 3 — <a>Acesso e navegação na Minha Área</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 4 — <a>Gestão de usuários e permissões</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 5 — <a>Configurações essenciais da plataforma</a></span></div></td><td class="a-zero">0,00%</td><td>01:30:00</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 6 — <a>Avaliação — Fundamentos do Suporte Lector</a></span></div></td><td class="a-zero">20,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 7 — <a>Avaliação — Registro e classificação de chamados</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 8 — <a>Avaliação — Diagnóstico de problemas frequentes</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 9 — <a>Avaliação — Comunicação com o cliente</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 10 — <a>Avaliação — Escalonamento e resolução de chamados</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 11 — <a>Boas práticas no atendimento Lector</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
-              <tr><td><div class="ct-inline"><span>Conteúdo 12 — <a>Base de conhecimento do Suporte Lector</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
-            </tbody>
-          </table>
+      </section>
+
+      <!-- ===== TUTORES ===== -->
+      <section class="panel" data-panel="tutores">
+        <div class="tutores-grid">
+          <div class="tutor-card">
+            <div class="tutor-avatar online"><i class="ui-icon icon-profile" aria-hidden="true"></i></div>
+            <div class="tutor-name">Dr. Roberto Silveira</div>
+            <div class="tutor-role">Instrutor Master — Gestão de Fluxos</div>
+            <button class="tutor-btn" type="button" data-tutor="roberto"><i class="ui-icon icon-chat" aria-hidden="true"></i> Falar com tutor</button>
+          </div>
+          <div class="tutor-card">
+            <div class="tutor-avatar offline"><i class="ui-icon icon-profile" aria-hidden="true"></i></div>
+            <div class="tutor-name">Ana Luiza Mello</div>
+            <div class="tutor-role">Especialista em Atendimento</div>
+            <button class="tutor-btn" type="button" data-tutor="ana"><i class="ui-icon icon-chat" aria-hidden="true"></i> Falar com tutor</button>
+          </div>
+          <div class="tutor-card">
+            <div class="tutor-avatar online"><i class="ui-icon icon-profile" aria-hidden="true"></i></div>
+            <div class="tutor-name">Marcos Oliveira</div>
+            <div class="tutor-role">Suporte Técnico e Integrações</div>
+            <button class="tutor-btn" type="button" data-tutor="marcos"><i class="ui-icon icon-chat" aria-hidden="true"></i> Falar com tutor</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== FÓRUNS ===== -->
+      <section class="panel" data-panel="foruns">
+        <div class="forum-carousel-wrap">
+          <div class="forum-carousel" id="forumCarousel">
+            <div class="forum-chip active" data-forum="geral">
+              <i class="ui-icon icon-messaging" aria-hidden="true"></i>
+              <span>Dúvidas gerais</span>
+            </div>
+            <div class="forum-chip" data-forum="praticas">
+              <i class="ui-icon icon-messaging" aria-hidden="true"></i>
+              <span>Boas práticas de atendimento</span>
+            </div>
+            <div class="forum-chip" data-forum="feedback">
+              <i class="ui-icon icon-messaging" aria-hidden="true"></i>
+              <span>Feedback do treinamento</span>
+            </div>
+          </div>
+        </div>
+        <div class="forum-active-label">Publicando em <b id="forumActiveName">Dúvidas gerais</b></div>
+
+        <div class="forum-compose">
+          <div class="forum-compose-top">
+            <div class="forum-avatar">CG</div>
+            <input type="text" class="forum-input" id="forumInput" placeholder="Compartilhe algo com a rede...">
+          </div>
+          <div class="forum-image-preview" id="forumImagePreview">
+            <img id="forumImagePreviewImg" src="" alt="">
+            <button type="button" class="forum-image-remove" id="forumImageRemove" aria-label="Remover imagem">
+              <i class="ui-icon icon-close" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="forum-compose-bottom">
+            <div class="forum-actions">
+              <button type="button" class="forum-action" id="forumImageBtn"><i class="ui-icon icon-picture" aria-hidden="true"></i> Imagem</button>
+              <button type="button" class="forum-action"><i class="ui-icon icon-video" aria-hidden="true"></i> Vídeo</button>
+              <button type="button" class="forum-action"><i class="ui-icon icon-attachment" aria-hidden="true"></i> Documento</button>
+            </div>
+            <button type="button" class="forum-publish" id="forumPublish" disabled>Publicar</button>
+          </div>
+          <input type="file" id="forumImageInput" accept="image/*" hidden>
+        </div>
+
+        <div class="forum-pubs-head"><span class="forum-pubs-bar"></span>Publicações</div>
+        <div class="forum-filters">
+          <div class="forum-search">
+            <i class="ui-icon icon-spyglass" aria-hidden="true"></i>
+            <input type="text" placeholder="Pesquisar publicação...">
+          </div>
+          <div class="forum-datefilter-wrap">
+            <div class="forum-datefilter" id="forumDateFilterBtn" role="button" tabindex="0">
+              <i class="ui-icon icon-calendar ui-orange" aria-hidden="true"></i>
+              <span id="forumDateFilterLabel">Filtrar por data</span>
+              <i class="ui-icon icon-pointer-down chev" aria-hidden="true"></i>
+            </div>
+            <div class="forum-date-popover" id="forumDatePopover">
+              <div class="fdp-title">Período de publicação</div>
+              <div class="fdp-field" data-field="inicial">
+                <label>Data inicial</label>
+                <div class="fdp-input"><span class="fdp-value">Selecionar</span></div>
+                <div class="fdp-calendar"></div>
+              </div>
+              <div class="fdp-field" data-field="final">
+                <label>Data final</label>
+                <div class="fdp-input"><span class="fdp-value">Selecionar</span></div>
+                <div class="fdp-calendar"></div>
+              </div>
+              <div class="fdp-actions">
+                <button type="button" class="fdp-cancel" id="fdpCancel">Cancelar</button>
+                <button type="button" class="fdp-confirm" id="fdpConfirm">Confirmar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="forum-feed" id="forumFeed"></div>
+      </section>
+
+      <!-- ===== SUGESTÕES ===== -->
+      <section class="panel" data-panel="sugestoes">
+        <h3 class="sugestoes-title">Conteúdos sugeridos</h3>
+        <div class="sugestoes-group">
+          <div class="sugestoes-label">Trilhas</div>
+        </div>
+        <div class="sugestoes-group">
+          <div class="sugestoes-label">Treinamentos</div>
         </div>
       </section>
 
@@ -681,6 +971,37 @@
   <iframe class="reader-frame" id="pdfFrame" title="Manual Minha área"></iframe>
   <div class="reader-video-wrap">
     <video class="reader-video" id="videoFrame" controls playsinline></video>
+  </div>
+</section>
+
+<section class="tutor-chat-screen" id="tutorChatScreen" aria-label="Conversa com tutor">
+  <div class="tutor-chat-top">
+    <button class="tutor-chat-back" type="button" id="tutorChatBack" aria-label="Voltar">
+      <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
+    </button>
+    <div class="tutor-chat-avatar" id="tutorChatAvatar"></div>
+    <div class="tutor-chat-who">
+      <div class="tutor-chat-name" id="tutorChatName"></div>
+      <div class="tutor-chat-status" id="tutorChatStatus"></div>
+    </div>
+    <div class="tutor-chat-actions">
+      <button type="button" class="tutor-chat-iconbtn" aria-label="Informações da conversa">
+        <i class="ui-icon icon-info" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="tutor-chat-iconbtn" aria-label="Adicionar participantes">
+        <i class="ui-icon icon-profile-plus" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+  <div class="tutor-chat-messages" id="tutorChatMessages"></div>
+  <div class="tutor-chat-inputbar">
+    <button class="tutor-chat-attach" type="button" aria-label="Anexar arquivo">
+      <i class="ui-icon icon-attachment" aria-hidden="true"></i>
+    </button>
+    <input type="text" class="tutor-chat-input" id="tutorChatInput" placeholder="Mensagem">
+    <button class="tutor-chat-send" type="button" id="tutorChatSend" aria-label="Enviar" disabled>
+      <i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
+    </button>
   </div>
 </section>
 
@@ -840,9 +1161,16 @@
   const CONTENT_VALUES = [100,100,0,0,0,20,100,100,100,100,0,0];
   const SCROLL_AFTER = 10;   // > 10 conteúdos => scroll horizontal
   const COL_WIDTH = 84;      // px por coluna quando há scroll
+  const LABEL_MAX_CHARS = 14;
+
+  function truncateLabel(text){
+    if(!text) return '';
+    return text.length > LABEL_MAX_CHARS ? text.slice(0, LABEL_MAX_CHARS).trimEnd()+'...' : text;
+  }
 
   function getItems(){
-    return CONTENT_VALUES.map((v,i)=>({ label:'Conteúdo '+(i+1), v }));
+    const nomes = Array.from(document.querySelectorAll('.conteudos-lista .cc-name')).map(el=>el.textContent.trim());
+    return CONTENT_VALUES.map((v,i)=>({ label: nomes[i] || ('Conteúdo '+(i+1)), v }));
   }
 
   function renderChart(){
@@ -853,7 +1181,7 @@
       const target = it.v===0 ? '1.5%' : it.v+'%';
       return '<div class="bar-col"><span class="bval">'+it.v+'%</span>'
            + '<div class="bar" data-target="'+target+'" style="height:0%"></div>'
-           + '<span class="blabel">'+it.label+'</span></div>';
+           + '<span class="blabel" title="'+it.label+'">'+truncateLabel(it.label)+'</span></div>';
     }).join('');
 
     // scroll when many contents
@@ -869,6 +1197,313 @@
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       bars.querySelectorAll('.bar').forEach(b=>{ b.style.height = b.dataset.target; });
     }));
+  }
+
+  // ── fórum: dados iniciais das publicações ──
+  const FORUM_AVATAR_STYLES = {
+    teal:{bg:'var(--teal-light)', color:'var(--teal)'},
+    navy:{bg:'var(--navy-light)', color:'var(--navy)'},
+    green:{bg:'var(--green-light)', color:'var(--green)'},
+    warn:{bg:'var(--warn-light)', color:'var(--warn)'},
+    orange:{bg:'var(--orange-subtle)', color:'var(--orange-dark)'}
+  };
+  const forumPosts = {
+    geral: [
+      { avatar:'LR', style:'teal', name:'Lia do RH', date:'terça-feira, 11/08', text:'Não esqueça de compartilhar sua experiência! Sua opinião é fundamental para tornarmos esse treinamento cada vez melhor.', image:'uploads/trail-automation-cover.png' },
+      { avatar:'MO', style:'navy', name:'Marcos Oliveira', date:'segunda-feira, 10/08', text:'Pessoal, alguém mais teve dúvida na etapa de classificação de chamados? Fiquei em dúvida sobre qual prioridade usar em cada caso.' }
+    ],
+    praticas: [
+      { avatar:'AL', style:'green', name:'Ana Luiza Mello', date:'quinta-feira, 06/08', text:'Uma dica que uso bastante: sempre confirmar o problema com o cliente antes de encerrar o chamado. Evita reabertura e retrabalho.' }
+    ],
+    feedback: [
+      { avatar:'RS', style:'warn', name:'Dr. Roberto Silveira', date:'sexta-feira, 14/08', text:'Treinamento muito completo! A parte de diagnóstico de problemas foi a que mais me ajudou no dia a dia de suporte.' }
+    ]
+  };
+
+  // ── fórum: feed de publicações ──
+  const forumFeed = document.getElementById('forumFeed');
+  function renderForumFeed(key){
+    if(!forumFeed) return;
+    const posts = forumPosts[key] || [];
+    if(!posts.length){
+      forumFeed.innerHTML = '<div class="forum-feed-empty">Nenhuma publicação ainda. Seja o primeiro a compartilhar algo por aqui.</div>';
+      return;
+    }
+    const st = k=>FORUM_AVATAR_STYLES[k] || FORUM_AVATAR_STYLES.orange;
+    forumFeed.innerHTML = posts.map(p=>{
+      const s = st(p.style);
+      return '<article class="forum-post">'
+        + '<div class="forum-post-head">'
+        + '<div class="forum-post-avatar" style="background:'+s.bg+';color:'+s.color+'">'+p.avatar+'</div>'
+        + '<div><div class="forum-post-name">'+p.name+'</div><div class="forum-post-date">'+p.date+'</div></div>'
+        + '</div>'
+        + (p.text ? '<div class="forum-post-text">'+p.text+'</div>' : '')
+        + (p.image ? '<div class="forum-post-image"><img src="'+p.image+'" alt=""></div>' : '')
+        + '</article>';
+    }).join('');
+  }
+
+  // ── fórum: composer (texto + imagem) ──
+  const forumInput = document.getElementById('forumInput');
+  const forumPublish = document.getElementById('forumPublish');
+  const forumImageBtn = document.getElementById('forumImageBtn');
+  const forumImageInput = document.getElementById('forumImageInput');
+  const forumImagePreview = document.getElementById('forumImagePreview');
+  const forumImagePreviewImg = document.getElementById('forumImagePreviewImg');
+  const forumImageRemove = document.getElementById('forumImageRemove');
+  let forumPendingImage = null;
+  let currentForumKey = 'geral';
+  function updatePublishState(){
+    if(forumPublish) forumPublish.disabled = forumInput.value.trim()==='' && !forumPendingImage;
+  }
+  function clearForumImage(){
+    forumPendingImage = null;
+    if(forumImageInput) forumImageInput.value = '';
+    if(forumImagePreview) forumImagePreview.classList.remove('show');
+    if(forumImagePreviewImg) forumImagePreviewImg.src = '';
+  }
+  if(forumInput && forumPublish){
+    forumInput.addEventListener('input', updatePublishState);
+  }
+  if(forumImageBtn && forumImageInput){
+    forumImageBtn.addEventListener('click', ()=> forumImageInput.click());
+    forumImageInput.addEventListener('change', ()=>{
+      const file = forumImageInput.files && forumImageInput.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        forumPendingImage = reader.result;
+        forumImagePreviewImg.src = forumPendingImage;
+        forumImagePreview.classList.add('show');
+        updatePublishState();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  if(forumImageRemove){
+    forumImageRemove.addEventListener('click', ()=>{ clearForumImage(); updatePublishState(); });
+  }
+  if(forumPublish){
+    forumPublish.addEventListener('click', ()=>{
+      if(forumPublish.disabled) return;
+      const text = forumInput.value.trim();
+      if(!text && !forumPendingImage) return;
+      if(!forumPosts[currentForumKey]) forumPosts[currentForumKey] = [];
+      const now = new Date();
+      const weekday = now.toLocaleDateString('pt-BR', { weekday:'long' });
+      const dd = String(now.getDate()).padStart(2,'0');
+      const mm = String(now.getMonth()+1).padStart(2,'0');
+      forumPosts[currentForumKey].unshift({
+        avatar:'CG', style:'orange', name:'Você', date: weekday+', '+dd+'/'+mm+' · agora',
+        text: text, image: forumPendingImage
+      });
+      renderForumFeed(currentForumKey);
+      forumInput.value = '';
+      clearForumImage();
+      updatePublishState();
+    });
+  }
+
+  // ── fórum: carrossel de fóruns do treinamento ──
+  const forumCarousel = document.getElementById('forumCarousel');
+  const forumActiveName = document.getElementById('forumActiveName');
+  function setActiveForumChip(chip){
+    forumCarousel.querySelectorAll('.forum-chip[data-forum]').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    currentForumKey = chip.dataset.forum;
+    if(forumActiveName) forumActiveName.textContent = chip.querySelector('span').textContent;
+    if(forumInput) forumInput.value='';
+    clearForumImage();
+    updatePublishState();
+    renderForumFeed(currentForumKey);
+  }
+  if(forumCarousel){
+    forumCarousel.addEventListener('click', e=>{
+      const chip = e.target.closest('.forum-chip[data-forum]');
+      if(chip) setActiveForumChip(chip);
+    });
+  }
+  renderForumFeed(currentForumKey);
+
+  // ── chat com tutor ──
+  const TUTORES = {
+    roberto: { nome:'Dr. Roberto Silveira', status:'online', style:'warn', iniciais:'RS',
+      mensagens:[
+        { texto:'Bom dia! Ficou alguma dúvida na etapa de Gestão de Fluxos?', hora:'09:12' },
+        { texto:'Bom dia! Fiquei com uma dúvida sobre a priorização dos chamados.', hora:'09:15', propria:true },
+        { texto:'Consegue me mandar o print da tela que você está vendo?', hora:'09:16' },
+        { texto:'Consegui entender, muito obrigado!', hora:'09:20', propria:true }
+      ] },
+    ana: { nome:'Ana Luiza Mello', status:'offline', style:'green', iniciais:'AL',
+      mensagens:[
+        { texto:'Oi! Vi que você concluiu a avaliação de Comunicação com o cliente, parabéns!', hora:'ontem' },
+        { texto:'Obrigado! Foi bem tranquila.', hora:'ontem', propria:true },
+        { texto:'Qualquer dúvida nas próximas etapas me chama por aqui.', hora:'ontem' }
+      ] },
+    marcos: { nome:'Marcos Oliveira', status:'online', style:'navy', iniciais:'MO',
+      mensagens:[
+        { texto:'Fala! Ficou tudo certo com o acesso à Minha Área?', hora:'14:02' },
+        { texto:'Ficou sim, valeu pela ajuda de mais cedo!', hora:'14:05', propria:true },
+        { texto:'Show, qualquer coisa é só chamar.', hora:'14:06' }
+      ] }
+  };
+  let tutorChatAtivo = null;
+  const tutorChatAvatar = document.getElementById('tutorChatAvatar');
+  const tutorChatName = document.getElementById('tutorChatName');
+  const tutorChatStatus = document.getElementById('tutorChatStatus');
+  const tutorChatMessages = document.getElementById('tutorChatMessages');
+  const tutorChatInput = document.getElementById('tutorChatInput');
+  const tutorChatSend = document.getElementById('tutorChatSend');
+  const tutorChatBack = document.getElementById('tutorChatBack');
+  function renderTutorChatMessages(){
+    const t = TUTORES[tutorChatAtivo];
+    if(!t || !tutorChatMessages) return;
+    tutorChatMessages.innerHTML = '<div class="tutor-chat-day"><span>Hoje</span></div>'
+      + t.mensagens.map(m=>
+          '<div class="tutor-chat-row'+(m.propria ? ' own' : '')+'">'
+          + '<div class="tutor-chat-bubble"><div class="tutor-chat-text">'+m.texto+'</div><div class="tutor-chat-time">'+m.hora+'</div></div>'
+          + '</div>'
+        ).join('');
+    tutorChatMessages.scrollTop = tutorChatMessages.scrollHeight;
+  }
+  function openTutorChat(id){
+    const t = TUTORES[id];
+    if(!t) return;
+    tutorChatAtivo = id;
+    const s = FORUM_AVATAR_STYLES[t.style] || FORUM_AVATAR_STYLES.orange;
+    tutorChatAvatar.style.background = s.color;
+    tutorChatAvatar.style.color = '#fff';
+    tutorChatAvatar.textContent = t.iniciais;
+    tutorChatAvatar.classList.toggle('online', t.status==='online');
+    tutorChatName.textContent = t.nome;
+    tutorChatStatus.textContent = t.status==='online' ? 'Online agora' : 'Offline';
+    tutorChatStatus.classList.toggle('online', t.status==='online');
+    renderTutorChatMessages();
+    document.body.classList.add('tutor-chat-open');
+    tutorChatInput.value = '';
+    tutorChatSend.disabled = true;
+  }
+  function closeTutorChat(){
+    document.body.classList.remove('tutor-chat-open');
+    tutorChatAtivo = null;
+  }
+  document.querySelectorAll('.tutor-btn[data-tutor]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openTutorChat(btn.dataset.tutor));
+  });
+  tutorChatBack?.addEventListener('click', closeTutorChat);
+  tutorChatInput?.addEventListener('input', ()=>{ tutorChatSend.disabled = tutorChatInput.value.trim()===''; });
+  function enviarMensagemTutor(){
+    const texto = tutorChatInput.value.trim();
+    if(!texto || !tutorChatAtivo) return;
+    const hora = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    TUTORES[tutorChatAtivo].mensagens.push({ texto, hora, propria:true });
+    renderTutorChatMessages();
+    tutorChatInput.value = '';
+    tutorChatSend.disabled = true;
+  }
+  tutorChatSend?.addEventListener('click', enviarMensagemTutor);
+  tutorChatInput?.addEventListener('keydown', e=>{ if(e.key==='Enter') enviarMensagemTutor(); });
+
+  // ── fórum: filtro por período (popover + calendário) ──
+  const forumDateFilterBtn = document.getElementById('forumDateFilterBtn');
+  const forumDatePopover = document.getElementById('forumDatePopover');
+  const MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  function buildCalendar(container, month, selected, onSelect){
+    const year = month.getFullYear(), mon = month.getMonth();
+    const startDow = new Date(year, mon, 1).getDay();
+    const daysInMonth = new Date(year, mon+1, 0).getDate();
+    const today = new Date(); today.setHours(0,0,0,0);
+    let html = '<div class="fdp-cal-head">'
+      + '<button type="button" class="fdp-cal-nav" data-nav="-1"><i class="ui-icon icon-left-open" aria-hidden="true"></i></button>'
+      + '<span>'+MONTH_NAMES[mon]+' '+year+'</span>'
+      + '<button type="button" class="fdp-cal-nav" data-nav="1"><i class="ui-icon icon-right-open" aria-hidden="true"></i></button>'
+      + '</div><div class="fdp-cal-grid">';
+    ['D','S','T','Q','Q','S','S'].forEach(d=>{ html += '<div class="fdp-cal-dow">'+d+'</div>'; });
+    for(let i=0;i<startDow;i++){ html += '<div class="fdp-cal-day empty"></div>'; }
+    for(let d=1; d<=daysInMonth; d++){
+      const dateObj = new Date(year, mon, d);
+      let cls = 'fdp-cal-day';
+      if(dateObj.getTime()===today.getTime()) cls += ' today';
+      if(selected && dateObj.getTime()===selected.getTime()) cls += ' selected';
+      html += '<div class="'+cls+'" data-day="'+d+'">'+d+'</div>';
+    }
+    html += '</div>';
+    container.innerHTML = html;
+    container.querySelector('[data-nav="-1"]').addEventListener('click', e=>{
+      e.stopPropagation(); month.setMonth(month.getMonth()-1); buildCalendar(container, month, selected, onSelect);
+    });
+    container.querySelector('[data-nav="1"]').addEventListener('click', e=>{
+      e.stopPropagation(); month.setMonth(month.getMonth()+1); buildCalendar(container, month, selected, onSelect);
+    });
+    container.querySelectorAll('.fdp-cal-day[data-day]').forEach(el=>{
+      el.addEventListener('click', e=>{ e.stopPropagation(); onSelect(new Date(year, mon, parseInt(el.dataset.day,10))); });
+    });
+  }
+  function closeAllForumCalendars(){
+    forumDatePopover?.querySelectorAll('.fdp-calendar.open').forEach(c=>c.classList.remove('open'));
+    forumDatePopover?.querySelectorAll('.fdp-input.open').forEach(i=>i.classList.remove('open'));
+  }
+  const forumDateFilterLabel = document.getElementById('forumDateFilterLabel');
+  const forumDateFilterDefaultLabel = forumDateFilterLabel ? forumDateFilterLabel.textContent : 'Filtrar por data';
+  const forumDateFieldStates = {};
+  function fmtDate(date){
+    const dd = String(date.getDate()).padStart(2,'0');
+    const mm = String(date.getMonth()+1).padStart(2,'0');
+    return dd+'/'+mm+'/'+date.getFullYear();
+  }
+  if(forumDateFilterBtn && forumDatePopover){
+    forumDatePopover.querySelectorAll('.fdp-field').forEach(field=>{
+      const input = field.querySelector('.fdp-input');
+      const valueEl = field.querySelector('.fdp-value');
+      const calEl = field.querySelector('.fdp-calendar');
+      const state = { month: new Date(), selected: null };
+      forumDateFieldStates[field.dataset.field] = state;
+      const render = ()=> buildCalendar(calEl, state.month, state.selected, date=>{
+        state.selected = date;
+        valueEl.textContent = fmtDate(date);
+        input.classList.add('filled');
+        calEl.classList.remove('open');
+        input.classList.remove('open');
+      });
+      input.addEventListener('click', e=>{
+        e.stopPropagation();
+        const willOpen = !calEl.classList.contains('open');
+        closeAllForumCalendars();
+        if(willOpen){ render(); calEl.classList.add('open'); input.classList.add('open'); }
+      });
+    });
+    forumDateFilterBtn.addEventListener('click', e=>{
+      e.stopPropagation();
+      forumDatePopover.classList.toggle('open');
+      forumDateFilterBtn.classList.toggle('open', forumDatePopover.classList.contains('open'));
+      if(!forumDatePopover.classList.contains('open')) closeAllForumCalendars();
+    });
+    document.getElementById('fdpCancel')?.addEventListener('click', e=>{
+      e.stopPropagation();
+      forumDatePopover.classList.remove('open');
+      forumDateFilterBtn.classList.remove('open');
+      closeAllForumCalendars();
+    });
+    document.getElementById('fdpConfirm')?.addEventListener('click', e=>{
+      e.stopPropagation();
+      forumDatePopover.classList.remove('open');
+      forumDateFilterBtn.classList.remove('open');
+      closeAllForumCalendars();
+      const inicio = forumDateFieldStates.inicial?.selected;
+      const fim = forumDateFieldStates.final?.selected;
+      if(forumDateFilterLabel){
+        if(inicio && fim) forumDateFilterLabel.textContent = fmtDate(inicio)+' – '+fmtDate(fim);
+        else if(inicio) forumDateFilterLabel.textContent = fmtDate(inicio);
+        else forumDateFilterLabel.textContent = forumDateFilterDefaultLabel;
+      }
+      forumDateFilterBtn.classList.toggle('filled', !!(inicio || fim));
+    });
+    document.addEventListener('click', ()=>{
+      forumDatePopover.classList.remove('open');
+      forumDateFilterBtn.classList.remove('open');
+      closeAllForumCalendars();
+    });
+    forumDatePopover.addEventListener('click', e=>e.stopPropagation());
   }
 
   // ── init ──
