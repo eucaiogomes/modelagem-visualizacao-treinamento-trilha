@@ -183,10 +183,23 @@
   .trail-cover img{display:block;width:100%;height:100%;object-fit:cover;}
   .trail-copy{min-width:0;flex:1;}
   .trail-copy h2{font-size:22px;font-weight:700;margin:0;color:#111;line-height:1.2;}
-  .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;}
+  .tabs-wrap{position:relative;}
+  .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;cursor:grab;user-select:none;}
+  .tabs.dragging{cursor:grabbing;}
   .tab{padding:11px 0;margin-right:28px;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:color .12s;white-space:nowrap;}
   .tab:hover{color:var(--ink);}
   .tab.active{color:var(--orange);font-weight:600;border-bottom-color:var(--orange);}
+  .tabs-nav-btn{display:none;position:absolute;top:0;bottom:1px;width:38px;align-items:center;z-index:11;border:0;padding:0;margin:0;cursor:pointer;background:transparent;opacity:1;transition:opacity .15s;}
+  .tabs-nav-btn.prev{left:0;justify-content:flex-start;background:linear-gradient(to left, rgba(255,255,255,0), #fff 60%);}
+  .tabs-nav-btn.next{right:0;justify-content:flex-end;background:linear-gradient(to right, rgba(255,255,255,0), #fff 60%);}
+  .tabs-nav-btn .chip{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--n300);box-shadow:var(--shadow-sm);color:var(--sub);transition:background .15s,border-color .15s,color .15s,transform .1s;}
+  .tabs-nav-btn.prev .chip{margin-left:3px;}
+  .tabs-nav-btn.next .chip{margin-right:3px;}
+  .tabs-nav-btn .chip .ui-icon{font-size:10px;}
+  .tabs-nav-btn:hover .chip{background:var(--orange-subtle);border-color:var(--orange);color:var(--orange-dark);}
+  .tabs-nav-btn:active .chip{transform:scale(.88);}
+  .tabs-wrap.tabs-at-start .tabs-nav-btn.prev{opacity:0;pointer-events:none;}
+  .tabs-wrap.tabs-at-end .tabs-nav-btn.next{opacity:0;pointer-events:none;}
 
   .panel{padding:24px 32px 56px;display:none;}
   .panel.show{display:block;animation:fade .2s ease;}
@@ -345,6 +358,7 @@
     .scroll{overflow:visible;}
     .tabs{top:56px;overflow-x:auto;scrollbar-width:none;}
     .tabs::-webkit-scrollbar{display:none;}
+    .tabs-nav-btn{display:flex;}
     .panel{padding:20px 24px 44px;}
     .chart-wrap{min-width:0;}
     .panel[data-panel="relatorios"] .card{overflow-x:auto!important;}
@@ -612,10 +626,14 @@
           </div>
         </section>
       </div>
-      <div class="tabs">
-        <div class="tab active" data-tab="descricao">Descrição</div>
-        <div class="tab" data-tab="desempenho">Desempenho</div>
-        <div class="tab" data-tab="relatorios">Relatórios</div>
+      <div class="tabs-wrap">
+        <div class="tabs">
+          <div class="tab active" data-tab="descricao">Descrição</div>
+          <div class="tab" data-tab="desempenho">Desempenho</div>
+          <div class="tab" data-tab="relatorios">Relatórios</div>
+        </div>
+        <button type="button" class="tabs-nav-btn prev" aria-label="Aba anterior"><span class="chip"><i class="ui-icon icon-arrow-left" aria-hidden="true"></i></span></button>
+        <button type="button" class="tabs-nav-btn next" aria-label="Próxima aba"><span class="chip"><i class="ui-icon icon-arrow-right" aria-hidden="true"></i></span></button>
       </div>
 
       <!-- ===== DESEMPENHO ===== -->
@@ -749,6 +767,60 @@
     if(name==='desempenho') renderChart(currentKey);
   }
   tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
+
+  // ── navegação das abas (setas < >) ──
+  const tabsEl = document.querySelector('.tabs');
+  const tabsWrap = document.querySelector('.tabs-wrap');
+  const tabsPrevBtn = document.querySelector('.tabs-nav-btn.prev');
+  const tabsNextBtn = document.querySelector('.tabs-nav-btn.next');
+  function syncTabsFade(){
+    if(!tabsEl || !tabsWrap) return;
+    const atStart = tabsEl.scrollLeft <= 2;
+    const atEnd = tabsEl.scrollLeft + tabsEl.clientWidth >= tabsEl.scrollWidth - 2;
+    tabsWrap.classList.toggle('tabs-at-start', atStart);
+    tabsWrap.classList.toggle('tabs-at-end', atEnd);
+  }
+  function scrollTabsBy(dir){
+    if(!tabsEl) return;
+    tabsEl.scrollBy({left: dir * tabsEl.clientWidth * 0.7, behavior:'smooth'});
+  }
+  if(tabsEl){
+    tabsEl.addEventListener('scroll', syncTabsFade);
+    window.addEventListener('resize', syncTabsFade);
+    syncTabsFade();
+  }
+  if(tabsPrevBtn) tabsPrevBtn.addEventListener('click', ()=>scrollTabsBy(-1));
+  if(tabsNextBtn) tabsNextBtn.addEventListener('click', ()=>scrollTabsBy(1));
+
+  // ── arrastar com o mouse para rolar as abas (toque já rola nativamente) ──
+  if(tabsEl){
+    let dragActive = false, dragMoved = false, dragStartX = 0, dragStartScroll = 0;
+    tabsEl.addEventListener('pointerdown', (e)=>{
+      if(e.pointerType !== 'mouse') return;
+      dragActive = true; dragMoved = false;
+      dragStartX = e.clientX;
+      dragStartScroll = tabsEl.scrollLeft;
+      tabsEl.setPointerCapture(e.pointerId);
+      tabsEl.classList.add('dragging');
+    });
+    tabsEl.addEventListener('pointermove', (e)=>{
+      if(!dragActive) return;
+      const dx = e.clientX - dragStartX;
+      if(Math.abs(dx) > 4) dragMoved = true;
+      tabsEl.scrollLeft = dragStartScroll - dx;
+    });
+    function endTabsDrag(){
+      if(!dragActive) return;
+      dragActive = false;
+      tabsEl.classList.remove('dragging');
+    }
+    tabsEl.addEventListener('pointerup', endTabsDrag);
+    tabsEl.addEventListener('pointercancel', endTabsDrag);
+    tabsEl.addEventListener('pointerleave', endTabsDrag);
+    tabsEl.addEventListener('click', (e)=>{
+      if(dragMoved){ e.stopPropagation(); dragMoved = false; }
+    }, true);
+  }
 
   // ── recolher/mostrar sidebar ──
   const sidebarClose = document.querySelector('.side-head .closebtn');
