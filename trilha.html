@@ -613,13 +613,13 @@
         </section>
       </div>
       <div class="tabs">
-        <div class="tab" data-tab="descricao">Descrição</div>
-        <div class="tab active" data-tab="desempenho">Desempenho</div>
+        <div class="tab active" data-tab="descricao">Descrição</div>
+        <div class="tab" data-tab="desempenho">Desempenho</div>
         <div class="tab" data-tab="relatorios">Relatórios</div>
       </div>
 
       <!-- ===== DESEMPENHO ===== -->
-      <section class="panel show" data-panel="desempenho">
+      <section class="panel" data-panel="desempenho">
         <div class="kpis">
           <div class="kpi"><div class="klbl">Aproveitamento requerido</div><div class="kval">20%</div></div>
           <div class="kpi"><div class="klbl">Aproveitamento parcial</div><div class="kval">12.5%</div></div>
@@ -660,7 +660,7 @@
       </section>
 
       <!-- ===== DESCRIÇÃO ===== -->
-      <section class="panel" data-panel="descricao">
+      <section class="panel show" data-panel="descricao">
         <div class="desc">
           <p>Descrição preenchida via Cypress.</p>
           <p>Este conteúdo faz parte da <strong>Etapa 2 — Ferramentas</strong> da Trilha Completa Automação. Conclua o vídeo e os documentos de apoio para liberar a avaliação e avançar para a próxima etapa.</p>
@@ -945,9 +945,7 @@
       }
     });
   });
-  let saved='desempenho';
-  try{ saved = localStorage.getItem('lector-trilhaA-tab') || 'desempenho'; }catch(e){}
-  activate(saved);
+  activate('descricao');
 </script>
 <script>
 (function(){
