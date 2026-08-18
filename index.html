@@ -759,9 +759,9 @@
       </div>
       <div class="tabs-wrap">
         <div class="tabs">
-          <div class="tab" data-tab="descricao">Descrição</div>
+          <div class="tab active" data-tab="descricao">Descrição</div>
           <div class="tab" data-tab="resumo">Resumo</div>
-          <div class="tab active" data-tab="desempenho">Desempenho</div>
+          <div class="tab" data-tab="desempenho">Desempenho</div>
           <div class="tab" data-tab="material">Material Complementar</div>
           <div class="tab" data-tab="autor">Sobre o Autor</div>
           <div class="tab" data-tab="tutores">Tutores</div>
@@ -773,7 +773,7 @@
       </div>
 
       <!-- ===== DESCRIÇÃO ===== -->
-      <section class="panel" data-panel="descricao">
+      <section class="panel show" data-panel="descricao">
         <div class="desc">
           <p>Descrição preenchida via Cypress.</p>
           <p>Este conteúdo faz parte do <strong>Treinamento Skill Suporte Lector</strong>. Conclua o vídeo e os documentos de apoio para liberar a avaliação e avançar no treinamento.</p>
@@ -788,7 +788,7 @@
       </section>
 
       <!-- ===== DESEMPENHO ===== -->
-      <section class="panel show" data-panel="desempenho">
+      <section class="panel" data-panel="desempenho">
         <div class="kpis">
           <div class="kpi"><div class="klbl">Aproveitamento requerido</div><div class="kval">20%</div></div>
           <div class="kpi"><div class="klbl">Aproveitamento parcial</div><div class="kval">12.5%</div></div>
@@ -1605,8 +1605,8 @@
       }
     });
   });
-  let saved='desempenho';
-  try{ saved = localStorage.getItem('lector-trilhaA-tab') || 'desempenho'; }catch(e){}
+  let saved='descricao';
+  try{ saved = localStorage.getItem('lector-trilhaA-tab') || 'descricao'; }catch(e){}
   activate(saved);
   openContentByIndex(0);
 </script>
