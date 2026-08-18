@@ -172,7 +172,6 @@
   .inline-video-frame{display:none;width:100%;flex:1;min-height:0;background:#111;object-fit:contain;}
   body.inline-video-open .inline-pdf-frame{display:none;}
   body.inline-video-open .inline-video-frame{display:block;}
-  .mobile-trail-hero{display:none;}
   .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;}
   .tab{padding:11px 0;margin-right:28px;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:color .12s;white-space:nowrap;}
   .tab:hover{color:var(--ink);}
@@ -332,10 +331,6 @@
     .mobile-crumbs a{color:var(--muted);text-decoration:none;}
     .mobile-crumbs .sep{color:var(--n400);}
     .mobile-crumbs .cur{color:var(--orange);font-weight:600;}
-    .mobile-trail-hero{display:block;margin:14px 14px 0;padding:18px 16px 16px;border-radius:8px;background:#ff8033;color:#fff;box-shadow:0 2px 7px rgba(232,119,34,.22);}
-    .mobile-trail-hero h1{margin:0 0 18px;font-size:21px;font-weight:700;line-height:1.12;color:#fff;}
-    .mobile-progress{display:grid;gap:14px;}
-    .mobile-progress .pm .pt{margin-bottom:7px;}
     .pagehead{display:none;}
     body.inline-pdf-open .pagehead,body.inline-video-open .pagehead{display:block;padding:10px 10px 0;}
     .inline-media-reader{height:calc(100vh - 72px);min-height:480px;}
@@ -565,19 +560,6 @@
         <a>Meus Treinamentos</a><span class="sep">›</span>
         <span class="cur">Nome Treinamento</span>
       </nav>
-      <section class="mobile-trail-hero" aria-label="Treinamento atual">
-        <h1>Treinamento Skill Suporte Lector</h1>
-        <div class="mobile-progress" aria-label="Progresso do treinamento">
-          <div class="pm">
-            <div class="pt"><span>Progresso</span><b>100%</b></div>
-            <div class="meter" style="--p:100;"><i></i></div>
-          </div>
-          <div class="pm">
-            <div class="pt"><span>Aproveitamento</span><b>100%</b></div>
-            <div class="meter" style="--p:100;"><i></i></div>
-          </div>
-        </div>
-      </section>
       <div class="pagehead">
         <section class="trail-summary" aria-label="Resumo do treinamento">
           <figure class="trail-cover">
