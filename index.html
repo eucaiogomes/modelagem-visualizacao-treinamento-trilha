@@ -164,10 +164,10 @@
   .inline-pdf-title{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .inline-content-nav{display:none;justify-content:space-between;align-items:center;margin-top:10px;}
   body.inline-pdf-open .inline-content-nav,body.inline-video-open .inline-content-nav{display:flex;}
-  .inline-content-nav-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:18px;border:1.5px solid var(--n300);background:#fff;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:.12s;}
-  .inline-content-nav-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .inline-content-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:0;background:var(--orange);color:#fff;cursor:pointer;transition:.12s;}
+  .inline-content-nav-btn:hover{background:var(--orange-dark);}
   .inline-content-nav-btn:disabled{opacity:.35;cursor:default;pointer-events:none;}
-  .inline-content-nav-btn .ui-icon{font-size:13px;}
+  .inline-content-nav-btn .ui-icon{font-size:15px;}
   .inline-pdf-frame{width:100%;flex:1;min-height:0;border:0;background:#252525;}
   .inline-video-frame{display:none;width:100%;flex:1;min-height:0;background:#111;object-fit:contain;}
   body.inline-video-open .inline-pdf-frame{display:none;}
@@ -578,10 +578,10 @@
         </section>
         <div class="inline-content-nav">
           <button class="inline-content-nav-btn prev" type="button" id="inlineNavPrev" aria-label="Conteúdo anterior">
-            <i class="ui-icon icon-arrow-left" aria-hidden="true"></i><span>Anterior</span>
+            <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
           </button>
           <button class="inline-content-nav-btn next" type="button" id="inlineNavNext" aria-label="Próximo conteúdo">
-            <span>Próximo</span><i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
+            <i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
           </button>
         </div>
       </div>
