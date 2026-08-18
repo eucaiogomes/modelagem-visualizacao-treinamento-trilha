@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script>
+(function(){
+  var MOBILE_W = 420;
+  if (window.top === window.self && window.innerWidth > MOBILE_W && new URLSearchParams(location.search).get('mv') !== '1') {
+    document.write('<style id="mv-hide">html{visibility:hidden!important;}</style>');
+  }
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treinamento Skill Suporte Lector — Conteúdo 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/lector-icons/css/lector-icons.css">
+<style>
+  :root{
+    --orange:#E87722; --orange-dark:#C4611A; --orange-subtle:#FDF0E6;
+    --teal:#1B8CA6; --teal-light:#E4F4F8;
+    --green:#3D8A52; --green-light:#EAF6EE; --success:#2E7D32;
+    --navy:#1C4B82; --navy-light:#E4EBF5;
+    --warn:#B45309; --warn-light:#FEF8EC;
+    --n0:#fff; --n50:#F9F9F9; --n100:#F5F5F5; --n200:#EBEBEB; --n300:#E0E0E0;
+    --n400:#CCCCCC; --n500:#999999; --n600:#666666; --n700:#444444; --n900:#1A1A1A;
+    --ink:#1A1A1A; --muted:#666; --sub:#999;
+    --sans:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+    --r-sm:4px; --r-md:6px; --r-lg:8px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+    --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{font-family:var(--sans);color:var(--ink);background:var(--n0);font-size:14px;-webkit-font-smoothing:antialiased;}
+  .ui-icon{display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none;}
+  .ui-icon:before{width:auto;margin:0;}
+  .ui-teal{color:var(--teal);}
+  .ui-orange{color:var(--orange);}
+  .ui-warn{color:var(--warn);}
+  .ui-green{color:var(--green);}
+  .ui-navy{color:var(--navy);}
+  .page-loader{position:fixed;inset:0;z-index:240;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .32s ease,visibility .32s ease;}
+  body.page-loaded .page-loader{opacity:0;visibility:hidden;pointer-events:none;}
+  .loader-atom{width:56px;height:56px;overflow:visible;}
+  .loader-atom .orbit{fill:none;stroke-linecap:round;stroke-width:5;transform-origin:50px 50px;}
+  .loader-atom .orbit-orange{stroke:#E87722;animation:atomSpin 1.15s linear infinite;}
+  .loader-atom .orbit-navy{stroke:#1C4B82;animation:atomSpinReverse 1.45s linear infinite;}
+  .loader-atom .core{fill:#1A1A1A;animation:atomPulse 1.15s ease-in-out infinite;}
+  @keyframes atomSpin{to{transform:rotate(360deg);}}
+  @keyframes atomSpinReverse{to{transform:rotate(-360deg);}}
+  @keyframes atomPulse{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.18);opacity:1;}}
+  .app{display:flex;height:100vh;overflow:hidden;}
+  body.sidebar-collapsed .side{display:none;}
+
+  /* ───── Left panel (trilha context) ───── */
+  .side{width:clamp(288px,19vw,340px);flex:none;background:var(--n50);border-right:1px solid var(--n300);display:flex;flex-direction:column;}
+  .side-head{padding:14px 16px 8px;background:#ff8033;display:flex;align-items:flex-start;gap:12px;border:0;color:#fff;}
+  .side-head > div{order:2;min-width:0;padding-top:1px;}
+  .side-head .lbl{display:none;}
+  .side-head h1{max-width:170px;font-size:18px;font-weight:700;color:#fff;margin:0;line-height:1.15;}
+  .closebtn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--n300);background:#fff;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;}
+  .closebtn:hover{border-color:var(--orange);color:var(--orange);}
+  .side-head .closebtn{order:1;width:42px;height:42px;margin-top:2px;border:0;border-radius:4px;background:transparent;color:#fff;}
+  .side-head .closebtn svg{width:28px;height:28px;}
+  .side-head .closebtn .ui-icon{font-size:24px;}
+  .side-head .closebtn:hover{background:rgba(255,255,255,.14);color:#fff;border-color:transparent;}
+
+  .progress-box{padding:10px 16px 16px;background:#ff8033;border-bottom:0;display:block;}
+  .progress-box .pm{display:block;margin-top:14px;}
+  .progress-box .pm:first-child{margin-top:0;}
+  .ring{ --p:26; width:56px;height:56px;flex:none;border-radius:50%;position:relative;
+    background:conic-gradient(var(--orange) calc(var(--p)*1%), var(--n200) 0);}
+  .ring.teal{background:conic-gradient(var(--teal) calc(var(--p)*1%), var(--n200) 0);}
+  .ring::after{content:'';position:absolute;inset:6px;background:var(--n50);border-radius:50%;}
+  .ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;font-size:14px;font-weight:700;color:var(--ink);}
+  .progress-box .ring{display:none;}
+  .pm .pt{font-size:12px;font-weight:700;letter-spacing:0;text-transform:uppercase;color:#fff;line-height:1;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+  .pm .pt b{font-size:12px;font-weight:700;color:#fff;}
+  .meter{height:5px;border-radius:99px;background:rgba(255,255,255,.34);overflow:hidden;}
+  .meter i{display:block;width:calc(var(--p)*1%);height:100%;border-radius:inherit;background:#fff;}
+  .side-mobile-back{display:none;}
+
+  .conteudos{flex:1;overflow-y:auto;padding:8px 6px;}
+  .conteudos-lista{border:1px solid var(--n300);border-radius:var(--r-md);background:#fff;overflow:hidden;}
+  .conteudo{display:flex;align-items:flex-start;gap:8px;padding:10px 8px;border-bottom:1px solid var(--n100);cursor:pointer;transition:background .1s;}
+  .conteudo:last-child{border-bottom:none;}
+  .conteudo:hover{background:var(--n50);}
+  .conteudo.checked:not(.active){background:rgba(61,138,82,.05);}
+  .conteudo.checked .ctico{color:var(--green);transition:color .15s;}
+  .ctico{transition:color .15s;}
+  @property --fpct{syntax:'<number>';initial-value:0;inherits:false;}
+  @keyframes fillDonut{from{--fpct:0}to{--fpct:100}}
+  @keyframes paAppear{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+  .pa-pie.filling{background:radial-gradient(circle at center,var(--n0) 0 54%,transparent 56%),conic-gradient(var(--orange) calc(var(--fpct)*1%),var(--n300) 0);animation:fillDonut .8s cubic-bezier(.25,.8,.25,1) forwards;}
+  .pa.pa-new{animation:paAppear .25s ease-out;}
+  .conteudo.active{background:var(--orange-subtle);border-left:3px solid var(--orange);padding-left:5px;}
+  .conteudo.locked{background:#f7f7f7;cursor:not-allowed;opacity:.74;}
+  .conteudo.locked:hover{background:#f7f7f7;}
+  .conteudo.locked .ctico{background:#eceff1!important;}
+  .conteudo.locked svg{stroke:#a8adb4!important;}
+  .conteudo.locked svg [fill]{fill:#a8adb4!important;}
+  .conteudo.locked .ui-icon{color:#a8adb4!important;}
+  .conteudo.locked .cc-name{color:#858b94;}
+  .conteudo.locked .cc-type{color:#a0a5ad;}
+  .ctico{width:18px;flex:none;display:flex;align-items:flex-start;padding-top:2px;color:var(--n400);}
+  .ctico .ui-icon{font-size:15px;}
+  .ctico .ui-icon{font-size:16px;}
+  .conteudo .cc-mid{flex:1;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"try try" "name name" "type type" "meta pa";column-gap:10px;row-gap:1px;align-items:center;align-content:start;min-height:72px;}
+  .conteudo .cc-name{grid-area:name;font-size:13px;font-weight:600;color:var(--ink);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;}
+  .conteudo.active .cc-name{font-weight:600;}
+  .conteudo .cc-type{grid-area:type;font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--sub);margin-top:0;display:flex;align-items:center;gap:5px;min-width:0;}
+  .pa{grid-area:pa;display:flex;justify-content:flex-end;align-items:center;gap:7px;margin-top:0;padding-right:2px;align-self:center;white-space:nowrap;}
+  .pa-item{display:inline-flex;align-items:center;gap:4px;color:var(--orange-dark);}
+  .pa .lab{min-width:8px;text-align:center;font-size:12px;font-weight:700;color:var(--orange);line-height:1;}
+  .pa-pie{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at center, var(--n0) 0 56%, transparent 58%), conic-gradient(var(--orange) calc(var(--pct,100)*1%), var(--n300) 0);color:var(--orange-dark);display:inline-flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;letter-spacing:0;line-height:1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+  .conteudo.active .pa-pie{background:radial-gradient(circle at center, var(--orange-subtle) 0 56%, transparent 58%), conic-gradient(var(--orange) calc(var(--pct,100)*1%), #f3c8a1 0);}
+  .conteudo.locked .pa-pie{background:radial-gradient(circle at center, #f7f7f7 0 56%, transparent 58%), conic-gradient(#a8adb4 calc(var(--pct,100)*1%), #d9dde2 0);color:#7a8089;}
+  .pa .lab-hint{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:help;outline:none;}
+  .pa .lab-hint::before,.pa .lab-hint::after{position:absolute;left:50%;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s ease,transform .12s ease,visibility .12s ease;z-index:30;}
+  .pa .lab-hint::before{content:"";bottom:calc(100% + 2px);transform:translateX(-50%) translateY(3px);border:5px solid transparent;border-top-color:#1f2937;}
+  .pa .lab-hint::after{content:attr(data-hint);bottom:calc(100% + 12px);transform:translateX(-50%) translateY(3px);background:#1f2937;color:#fff;border-radius:4px;padding:5px 7px;font-size:11px;font-weight:700;line-height:1;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.16);}
+  .pa .lab-hint:hover::before,.pa .lab-hint:hover::after,.pa .lab-hint:focus-visible::before,.pa .lab-hint:focus-visible::after{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+  .cc-status{grid-area:meta;font-size:11px;font-weight:700;margin-top:0;line-height:1.2;}
+  .cc-status.approved{color:var(--green);}
+  .cc-status.failed{color:#c2410c;}
+  .cc-status.progress{color:var(--teal);}
+  .cc-status.muted{color:var(--sub);}
+  .cc-status.blocked{color:#7a8089;}
+  .cc-try{grid-area:try;font-size:10px;font-weight:400;color:var(--sub);white-space:nowrap;align-self:center;}
+  .cc-meta-row{grid-area:meta;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:0;}
+  .cc-meta-row .cc-status,.cc-meta-row .cc-try{margin-top:0;}
+
+  /* ───── Main column ───── */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .topbar{height:56px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--n300);background:#fff;}
+  .btn-accent{width:38px;height:38px;border-radius:50%;border:none;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;box-shadow:0 2px 6px rgba(232,119,34,.32);padding:0;}
+  .btn-accent:hover{background:var(--orange-dark);}
+  .btn-accent.center.middle{align-items:center;justify-content:center;}
+  .btn-accent[class*=" icon-"]:before{width:auto;margin:0;font-size:18px;line-height:1;}
+  .crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap;min-width:0;}
+  .crumbs .sep{color:var(--n400);}
+  .crumbs a{color:var(--muted);text-decoration:none;cursor:pointer;}
+  .crumbs a:hover{color:var(--orange);}
+  .crumbs .cur{color:var(--orange);font-weight:600;}
+  .mobile-crumbs{display:none;}
+  .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:16px;}
+  .iconbtn{color:var(--sub);cursor:pointer;display:flex;}
+  .iconbtn:hover{color:var(--muted);}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;cursor:pointer;}
+
+  .scroll{flex:1;overflow-y:auto;}
+  .pagehead{padding:14px 24px 0;}
+  .trail-summary{min-height:146px;background:#fff;border:1px solid #dcdcdc;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.14);display:flex;align-items:center;gap:24px;padding:20px 24px;}
+  .trail-cover{width:196px;height:112px;margin:0;border:1px solid #ececec;border-radius:7px;overflow:hidden;background:#f6f7f8;flex:none;}
+  .trail-cover img{display:block;width:100%;height:100%;object-fit:cover;}
+  .trail-copy{min-width:0;flex:1;}
+  .trail-copy h2{font-size:22px;font-weight:700;margin:0;color:#111;line-height:1.2;}
+  .inline-media-reader{display:none;height:clamp(520px,calc(100vh - 150px),820px);min-height:0;background:#252525;border:1px solid #dcdcdc;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.14);overflow:hidden;flex-direction:column;}
+  body.inline-pdf-open .trail-summary,body.inline-video-open .trail-summary{display:none;}
+  body.inline-pdf-open .inline-media-reader,body.inline-video-open .inline-media-reader{display:flex;}
+  .inline-pdf-head{height:44px;flex:none;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;padding:0 16px;}
+  .inline-pdf-title{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .inline-content-nav{display:none;justify-content:space-between;align-items:center;margin-top:10px;}
+  body.inline-pdf-open .inline-content-nav,body.inline-video-open .inline-content-nav{display:flex;}
+  .inline-content-nav-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:18px;border:1.5px solid var(--n300);background:#fff;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:.12s;}
+  .inline-content-nav-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .inline-content-nav-btn:disabled{opacity:.35;cursor:default;pointer-events:none;}
+  .inline-content-nav-btn .ui-icon{font-size:13px;}
+  .inline-pdf-frame{width:100%;flex:1;min-height:0;border:0;background:#252525;}
+  .inline-video-frame{display:none;width:100%;flex:1;min-height:0;background:#111;object-fit:contain;}
+  body.inline-video-open .inline-pdf-frame{display:none;}
+  body.inline-video-open .inline-video-frame{display:block;}
+  .mobile-trail-hero{display:none;}
+  .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;}
+  .tab{padding:11px 0;margin-right:28px;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:color .12s;white-space:nowrap;}
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:var(--orange);font-weight:600;border-bottom-color:var(--orange);}
+
+  .panel{padding:24px 32px 56px;display:none;}
+  .panel.show{display:block;animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px;}
+  .kpi{background:#fff;border:1px solid var(--n300);border-top:3px solid var(--orange);border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--shadow-sm);}
+  .kpi.teal{border-top-color:var(--teal);}
+  .kpi.navy{border-top-color:var(--navy);}
+  .kpi .klbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--sub);}
+  .kpi .kval{font-size:28px;font-weight:700;color:var(--ink);margin-top:8px;line-height:1;}
+  .kpi.teal .kval{color:var(--teal);font-size:20px;}
+  .kpi.navy .kval{color:var(--navy);}
+  .kpi .ksub{font-size:12px;color:var(--muted);margin-top:6px;}
+
+  .card{background:#fff;border:1px solid var(--n300);border-radius:var(--r-md);box-shadow:var(--shadow-sm);}
+  .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--n200);gap:12px;flex-wrap:wrap;}
+  .card-head h3{font-size:16px;font-weight:600;margin:0;color:var(--ink);}
+  .card-body{padding:18px;}
+  .filters{display:flex;gap:8px;}
+  .selpill{font-size:12px;font-weight:600;color:var(--muted);background:var(--n100);border:1px solid var(--n300);border-radius:var(--r-sm);padding:5px 10px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:.12s;}
+  .selpill:hover{border-color:var(--n400);}
+  .selpill.on{background:var(--orange-subtle);border-color:#f0c79a;color:var(--orange-dark);}
+  .selpill.static{cursor:default;}
+  .selpill.static:hover{border-color:#f0c79a;}
+  button.selpill{font-family:var(--sans);}
+  .dropdown{position:relative;}
+  .dropdown-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:178px;background:#fff;border:1px solid var(--n300);border-radius:var(--r-md);box-shadow:var(--shadow-md);padding:5px;z-index:20;display:none;}
+  .dropdown.open .dropdown-menu{display:block;}
+  .dd-opt{font-size:13px;color:var(--n700);padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .dd-opt:hover{background:var(--n100);}
+  .dd-opt.is-sel{background:var(--orange-subtle);color:var(--orange-dark);font-weight:600;}
+  .dd-opt .ck{opacity:0;}
+  .dd-opt.is-sel .ck{opacity:1;}
+  .dd-chev{transition:transform .2s;}
+  .dd-chev.ui-icon{font-size:13px;}
+  .dropdown.open .dd-chev{transform:rotate(180deg);}
+  .chart-hint{font-size:12px;color:var(--sub);margin-top:12px;}
+
+  /* chart */
+  .chart-wrap{display:flex;gap:10px;}
+  .yaxis{display:flex;flex-direction:column;justify-content:space-between;height:240px;padding-bottom:42px;font-size:11px;color:var(--sub);text-align:right;width:30px;flex:none;}
+  .plot-scroll{flex:1;overflow-x:auto;overflow-y:hidden;}
+  .plot-scroll::-webkit-scrollbar{height:9px;}
+  .plot-scroll::-webkit-scrollbar-thumb{background:var(--n300);border-radius:99px;}
+  .plot-scroll::-webkit-scrollbar-thumb:hover{background:var(--n400);}
+  .plot-scroll::-webkit-scrollbar-track{background:var(--n100);border-radius:99px;}
+  .plot{position:relative;min-width:100%;}
+  .grid-lines{position:absolute;inset:0 0 42px 0;display:flex;flex-direction:column;justify-content:space-between;}
+  .grid-lines i{border-top:1px solid var(--n200);height:0;}
+  .bars{position:relative;display:flex;align-items:flex-end;gap:18px;height:240px;padding-bottom:42px;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;min-width:0;}
+  .bar{width:62%;max-width:54px;background:var(--orange);border-radius:4px 4px 0 0;transition:height .55s cubic-bezier(.2,.7,.2,1),background .12s;cursor:pointer;}
+  .bar-col:hover .bar{background:var(--orange-dark);}
+  .bar-col .blabel{position:absolute;bottom:-24px;font-size:11px;color:var(--muted);font-weight:500;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-col .bval{position:absolute;top:-22px;font-size:12px;font-weight:700;color:var(--orange-dark);opacity:0;transition:opacity .12s;}
+  .bar-col:hover .bval{opacity:1;}
+
+  /* Descrição */
+  .desc{max-width:680px;}
+  .desc p{font-size:14px;line-height:1.6;color:var(--n700);margin:0 0 14px;}
+
+  /* Relatórios */
+  .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .tool{width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s;box-shadow:0 2px 5px rgba(232,119,34,.28);}
+  .tool:hover{background:var(--orange-dark);}
+  .tool .ui-icon{font-size:18px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);padding:12px 14px;border-bottom:2px solid var(--n300);}
+  th .sort{color:var(--orange);margin-left:4px;}
+  td{padding:14px;border-bottom:1px solid var(--n200);color:var(--n700);vertical-align:middle;}
+  tr:hover td{background:var(--n50);}
+  td.a-good{color:var(--success);font-weight:600;}
+  td.a-zero{color:var(--n500);}
+  .ct-inline{display:flex;align-items:center;gap:10px;}
+  .ct-inline a{color:var(--orange);text-decoration:none;}
+  .ct-inline a:hover{text-decoration:underline;}
+
+  /* Leitor de PDF */
+  body.reader-open{overflow:hidden;background:#252525;}
+  body.reader-open .app{display:none;}
+  .reader-screen{display:none;height:100vh;background:#252525;flex-direction:column;}
+  body.reader-open .reader-screen{display:flex;}
+  .reader-top{height:50px;flex:none;background:#fff;display:flex;align-items:center;padding:0 0 0 14px;}
+  .reader-back{height:34px;border:0;border-radius:18px;background:#ff8033;color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;padding:0 17px 0 13px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 5px rgba(232,119,34,.24);}
+  .reader-back:hover{background:var(--orange-dark);}
+  .reader-back svg{width:17px;height:17px;flex:none;}
+  .reader-back .ui-icon{font-size:17px;}
+  .reader-brand{display:none;margin-left:auto;margin-right:36px;color:#777;font-size:20px;font-weight:700;line-height:1;}
+  .reader-brand em{font-size:14px;font-weight:400;font-style:italic;margin-left:2px;}
+  body.certificate-reader .reader-brand{display:block;}
+  .reader-frame{flex:1;width:100%;border:0;background:#252525;}
+  .reader-video-wrap{display:none;flex:1;min-height:0;background:#202020;padding:28px;align-items:center;justify-content:center;}
+  .reader-video{width:min(100%,1180px);max-height:calc(100vh - 106px);background:#000;box-shadow:0 18px 42px rgba(0,0,0,.34);}
+  body.video-reader .reader-frame{display:none;}
+  body.video-reader .reader-video-wrap{display:flex;}
+  body.pdf-reader .reader-video-wrap{display:none;}
+  body.pdf-reader .reader-frame{display:block;}
+
+  .certificate-overlay{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;padding-top:37px;}
+  body.certificate-loading .certificate-overlay{display:flex;}
+  .certificate-modal{width:min(346px,calc(100vw - 32px));min-height:120px;background:#fff;border-radius:16px;box-shadow:0 18px 42px rgba(0,0,0,.18);padding:22px 20px 22px;}
+  .certificate-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px;}
+  .certificate-modal h3{margin:0;color:#003b79;font-size:20px;font-weight:700;line-height:1.1;}
+  .certificate-close{width:28px;height:28px;border:0;background:transparent;color:#667085;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+  .certificate-close:hover{color:#1f2937;}
+  .certificate-close .ui-icon{font-size:22px;}
+  .certificate-modal p{margin:0;color:#001b3f;font-size:13px;line-height:1.45;}
+
+  .sidebar-toggle{position:fixed;left:14px;top:9px;z-index:80;width:38px;height:38px;border:0;border-radius:50%;background:#ff8033;color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(232,119,34,.32);cursor:pointer;}
+  .sidebar-toggle:hover{background:var(--orange-dark);}
+  .sidebar-toggle .ui-icon{font-size:24px;}
+  body.sidebar-collapsed .sidebar-toggle{display:flex;}
+  body.sidebar-collapsed .topbar{padding-left:64px;}
+  body.reader-open .sidebar-toggle{display:none;}
+
+  @media (min-width:1440px){
+    .pagehead{padding:22px 40px 0;}
+    .tabs{padding:0 40px;}
+    .panel{padding:28px 40px 64px;}
+    .trail-summary{min-height:150px;padding-left:30px;padding-right:28px;}
+    .kpis{gap:20px;}
+    .bars{gap:22px;}
+    .bar{max-width:64px;}
+  }
+
+  @media (max-width:1100px){
+    .side{width:288px;}
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .trail-summary{gap:14px;}
+    .trail-cover{width:174px;height:98px;}
+    .trail-copy h2{font-size:21px;}
+  }
+
+  @media (max-width:900px){
+    html,body{height:auto;min-height:100%;}
+    body{overflow:auto;overflow-x:hidden;background:var(--n50);}
+    .app{height:auto;min-height:100vh;overflow:visible;flex-direction:column;}
+    body.sidebar-collapsed .app{display:flex;}
+    .side{position:fixed;left:0;top:0;bottom:0;z-index:90;width:min(86vw,340px);max-width:340px;height:100vh;border-right:1px solid var(--n300);border-bottom:0;box-shadow:0 18px 42px rgba(0,0,0,.18);}
+    .side-head{padding:14px 16px 8px;}
+    .side-head h1{max-width:none;}
+    .progress-box{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px;padding:10px 16px 16px;}
+    .progress-box .pm{margin-top:0;}
+    .side-mobile-back{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 12px 0;height:38px;border:1px solid #f0c79a;border-radius:8px;background:#fff;color:var(--orange-dark);font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;}
+    .side-mobile-back:hover{background:var(--orange-subtle);}
+    .conteudos{flex:1;max-height:none;overflow-y:auto;padding:8px 6px 10px;}
+    .main{flex:none;min-height:0;background:#fff;}
+    .topbar{position:sticky;top:0;z-index:30;padding:0 14px;}
+    .topbar .btn-accent,.crumbs{display:none;}
+    .mobile-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin:12px 14px 0;font-size:12px;color:var(--muted);}
+    .mobile-crumbs a{color:var(--muted);text-decoration:none;}
+    .mobile-crumbs .sep{color:var(--n400);}
+    .mobile-crumbs .cur{color:var(--orange);font-weight:600;}
+    .mobile-trail-hero{display:block;margin:14px 14px 0;padding:18px 16px 16px;border-radius:8px;background:#ff8033;color:#fff;box-shadow:0 2px 7px rgba(232,119,34,.22);}
+    .mobile-trail-hero h1{margin:0 0 18px;font-size:21px;font-weight:700;line-height:1.12;color:#fff;}
+    .mobile-progress{display:grid;gap:14px;}
+    .mobile-progress .pm .pt{margin-bottom:7px;}
+    .pagehead{display:none;}
+    body.inline-pdf-open .pagehead,body.inline-video-open .pagehead{display:block;padding:10px 10px 0;}
+    .inline-media-reader{height:calc(100vh - 72px);min-height:480px;}
+    .scroll{overflow:visible;}
+    .tabs{top:56px;overflow-x:auto;scrollbar-width:none;}
+    .tabs::-webkit-scrollbar{display:none;}
+    .panel{padding:20px 24px 44px;}
+    .chart-wrap{min-width:0;}
+    .panel[data-panel="relatorios"] .card{overflow-x:auto!important;}
+    table{min-width:720px;}
+  }
+
+  @media (max-width:760px){
+    .pagehead{padding:14px 14px 0;}
+    .trail-summary{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:center;gap:12px 14px;min-height:0;padding:14px;}
+    .trail-cover{width:112px;height:66px;}
+    .trail-copy{min-width:0;}
+    .trail-copy h2{font-size:18px;}
+    .tabs{padding:0 14px;margin-top:14px;}
+    .tab{font-size:12px;margin-right:22px;padding:10px 0;}
+    .panel{padding:18px 14px 40px;}
+    .kpis{grid-template-columns:1fr;gap:12px;}
+    .kpi{padding:14px 15px;}
+    .kpi .kval{font-size:24px;}
+    .kpi.teal .kval{font-size:18px;}
+    .card-head{align-items:flex-start;padding:14px 15px 11px;}
+    .card-body{padding:14px;}
+    .bars{gap:10px;height:220px;}
+    .yaxis{height:220px;}
+    .toolbar{gap:8px;}
+    .tool{width:38px;height:38px;}
+    .reader-top{height:48px;padding-left:10px;}
+  }
+
+  @media (max-width:520px){
+    .side-head{gap:8px;}
+    .side-head .closebtn{width:36px;height:36px;}
+    .side-head .closebtn svg{width:24px;height:24px;}
+    .side-head .closebtn .ui-icon{font-size:22px;}
+    .side-head h1{font-size:17px;}
+    .progress-box{grid-template-columns:1fr;gap:12px;padding-bottom:42px;}
+    .conteudos{max-height:none;padding:6px;}
+    .conteudo{padding:10px 8px;}
+    .topbar{height:52px;gap:10px;padding:0 10px;}
+    .btn-accent{width:34px;height:34px;}
+    .crumbs{font-size:12px;}
+    .topbar-actions{gap:10px;}
+    .iconbtn{display:none;}
+    .avatar{width:30px;height:30px;}
+    .trail-summary{grid-template-columns:98px minmax(0,1fr);padding:12px;}
+    .trail-cover{width:98px;height:58px;}
+    .trail-copy h2{font-size:17px;}
+    .tabs{top:52px;}
+    .plot-scroll{padding-bottom:2px;}
+    .bar-col .blabel{font-size:10px;}
+    .reader-back{height:34px;font-size:12px;padding:0 14px 0 12px;}
+    .reader-video-wrap{padding:12px;background:#111;}
+    .reader-video{max-height:calc(100vh - 72px);}
+  }
+
+  @media (max-width:420px){
+    .conteudo{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px 9px;}
+    .conteudo .ctico{grid-column:1;grid-row:1;}
+    .conteudo .cc-mid{grid-column:2;grid-row:1;min-width:0;}
+    .pa{flex-wrap:wrap;gap:5px 7px;padding-right:0;}
+    .pa-item{gap:3px;}
+    .pa-pie{width:30px;height:30px;font-size:9px;}
+    .trail-summary{grid-template-columns:88px minmax(0,1fr);gap:10px 12px;}
+    .trail-cover{width:88px;height:54px;}
+    .trail-copy h2{font-size:16px;}
+  }
+</style>
+</head>
+<body>
+<div class="page-loader" id="pageLoader" role="status" aria-label="Carregando">
+  <svg class="loader-atom" viewBox="0 0 100 100" aria-hidden="true">
+    <ellipse class="orbit orbit-orange" cx="50" cy="50" rx="34" ry="12" transform="rotate(26 50 50)"/>
+    <ellipse class="orbit orbit-navy" cx="50" cy="50" rx="34" ry="12" transform="rotate(-55 50 50)"/>
+    <circle class="core" cx="50" cy="50" r="5"/>
+  </svg>
+</div>
+<div class="app">
+
+  <!-- ───────── LEFT PANEL ───────── -->
+  <aside class="side">
+    <div class="side-head">
+      <div>
+        <div class="lbl">Treinamento</div>
+        <h1>Treinamento Skill Suporte Lector</h1>
+      </div>
+      <button class="closebtn" title="Sair do treinamento" aria-label="Sair">
+        <i class="ui-icon icon-close" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="progress-box">
+      <div class="pm">
+        <div class="pt"><span>Progresso</span><b>100%</b></div>
+        <div class="meter" style="--p:100;"><i></i></div>
+      </div>
+      <div class="pm">
+        <div class="pt"><span>Aproveitamento</span><b>100%</b></div>
+        <div class="meter" style="--p:100;"><i></i></div>
+      </div>
+    </div>
+
+    <button class="side-mobile-back" type="button" aria-label="Voltar">
+      <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
+      <span>Voltar</span>
+    </button>
+
+    <div class="conteudos">
+      <div class="conteudos-lista">
+          <div class="conteudo active" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
+            <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-try">Tentativa 1/2</div>
+              <div class="pa">
+                <span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie">100%</span></span>
+                <span class="pa-item" style="--pct:100"><span class="lab" title="Aproveitamento: 100%">A</span><span class="pa-pie">100%</span></span>
+              </div>
+              <div class="cc-name" title="Boas-vindas ao Suporte Lector">Boas-vindas ao Suporte Lector</div>
+              <div class="cc-type">Documento</div>
+              <div class="cc-meta-row"><div class="cc-status approved">Aprovado</div></div>
+            </div>
+          </div>
+          <div class="conteudo" data-open-video="uploads/linguagens-programacao.mp4" role="button" tabindex="0">
+            <div class="ctico" style="background:var(--orange-subtle)"><i class="ui-icon icon-play-media ui-orange" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-try">Tentativa 2/3</div>
+              <div class="pa">
+                <span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie">100%</span></span>
+                <span class="pa-item" style="--pct:100"><span class="lab" title="Aproveitamento: 100%">A</span><span class="pa-pie">100%</span></span>
+              </div>
+              <div class="cc-name" title="Visão geral da plataforma Lector">Visão geral da plataforma Lector</div>
+              <div class="cc-type">Vídeo</div>
+              <div class="cc-meta-row"><div class="cc-status progress">Em andamento</div></div>
+            </div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-png ui-teal" aria-hidden="true"></i></div>
+            <div class="cc-mid"><div class="cc-name" title="Acesso e navegação na Minha Área">Acesso e navegação na Minha Área</div><div class="cc-type">Documento</div><div class="cc-status muted">Não visualizado</div></div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
+            <div class="cc-mid"><div class="cc-name" title="Gestão de usuários e permissões">Gestão de usuários e permissões</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
+            <div class="cc-mid"><div class="cc-name" title="Configurações essenciais da plataforma">Configurações essenciais da plataforma</div><div class="cc-type">Documento</div><div class="cc-status muted">Não visualizado</div></div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-file-xls ui-warn" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-try">Tentativa 1/2</div>
+              <div class="pa">
+                <span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie">100%</span></span>
+                <span class="pa-item" style="--pct:20"><span class="lab" title="Aproveitamento: 20%">A</span><span class="pa-pie">20%</span></span>
+              </div>
+              <div class="cc-name" title="Avaliação — Fundamentos do Suporte Lector">Avaliação — Fundamentos do Suporte Lector</div>
+              <div class="cc-type">Avaliação</div>
+              <div class="cc-meta-row"><div class="cc-status failed">Reprovado</div></div>
+            </div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-try">Tentativa 1/1</div>
+              <div class="pa"><span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie">100%</span></span><span class="pa-item" style="--pct:100"><span class="lab" title="Aproveitamento: 100%">A</span><span class="pa-pie">100%</span></span></div>
+              <div class="cc-name" title="Avaliação — Registro e classificação de chamados">Avaliação — Registro e classificação de chamados</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
+            </div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-try">Tentativa 1/1</div>
+              <div class="pa"><span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie">100%</span></span><span class="pa-item" style="--pct:100"><span class="lab" title="Aproveitamento: 100%">A</span><span class="pa-pie">100%</span></span></div>
+              <div class="cc-name" title="Avaliação — Diagnóstico de problemas frequentes">Avaliação — Diagnóstico de problemas frequentes</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
+            </div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-try">Tentativa 1/1</div>
+              <div class="pa"><span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie">100%</span></span><span class="pa-item" style="--pct:100"><span class="lab" title="Aproveitamento: 100%">A</span><span class="pa-pie">100%</span></span></div>
+              <div class="cc-name" title="Avaliação — Comunicação com o cliente">Avaliação — Comunicação com o cliente</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
+            </div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-try">Tentativa 1/1</div>
+              <div class="pa"><span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie">100%</span></span><span class="pa-item" style="--pct:100"><span class="lab" title="Aproveitamento: 100%">A</span><span class="pa-pie">100%</span></span></div>
+              <div class="cc-name" title="Avaliação — Escalonamento e resolução de chamados">Avaliação — Escalonamento e resolução de chamados</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
+            </div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico"></div>
+            <div class="cc-mid"><div class="cc-name" title="Boas práticas no atendimento Lector">Boas práticas no atendimento Lector</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
+          </div>
+          <div class="conteudo">
+            <div class="ctico"></div>
+            <div class="cc-mid"><div class="cc-name" title="Base de conhecimento do Suporte Lector">Base de conhecimento do Suporte Lector</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
+          </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ───────── MAIN ───────── -->
+  <div class="main">
+    <div class="topbar">
+      <button id="hideResource" ng-if="!showFinishtrail()" ng-click="hideResource()" class="btn-accent icon-undo center middle ng-scope" title="Voltar" aria-label="Voltar"></button>
+      <nav class="crumbs">
+        <a>Vitrine</a><span class="sep">›</span>
+        <a>Teste Automação</a><span class="sep">›</span>
+        <a>Minha Área</a><span class="sep">›</span>
+        <a>Meus Treinamentos</a><span class="sep">›</span>
+        <span class="cur">Conteúdo 2</span>
+      </nav>
+    </div>
+
+    <div class="scroll">
+      <nav class="mobile-crumbs" aria-label="Caminho de navegação">
+        <a>Vitrine</a><span class="sep">›</span>
+        <a>Nome da Vitrine</a><span class="sep">›</span>
+        <a>Minha Área</a><span class="sep">›</span>
+        <a>Meus Treinamentos</a><span class="sep">›</span>
+        <span class="cur">Nome Treinamento</span>
+      </nav>
+      <section class="mobile-trail-hero" aria-label="Treinamento atual">
+        <h1>Treinamento Skill Suporte Lector</h1>
+        <div class="mobile-progress" aria-label="Progresso do treinamento">
+          <div class="pm">
+            <div class="pt"><span>Progresso</span><b>100%</b></div>
+            <div class="meter" style="--p:100;"><i></i></div>
+          </div>
+          <div class="pm">
+            <div class="pt"><span>Aproveitamento</span><b>100%</b></div>
+            <div class="meter" style="--p:100;"><i></i></div>
+          </div>
+        </div>
+      </section>
+      <div class="pagehead">
+        <section class="trail-summary" aria-label="Resumo do treinamento">
+          <figure class="trail-cover">
+            <img src="uploads/trail-automation-cover.png" alt="Imagem do treinamento">
+          </figure>
+          <div class="trail-copy">
+            <h2>Treinamento Skill Suporte Lector</h2>
+          </div>
+        </section>
+        <section class="inline-media-reader" aria-label="Conteúdo do treinamento">
+          <div class="inline-pdf-head">
+            <strong class="inline-pdf-title" id="inlineMediaTitle">Boas-vindas ao Suporte Lector</strong>
+          </div>
+          <iframe class="inline-pdf-frame" id="inlinePdfFrame" title="Boas-vindas ao Suporte Lector"></iframe>
+          <video class="inline-video-frame" id="inlineVideoFrame" controls playsinline></video>
+        </section>
+        <div class="inline-content-nav">
+          <button class="inline-content-nav-btn prev" type="button" id="inlineNavPrev" aria-label="Conteúdo anterior">
+            <i class="ui-icon icon-arrow-left" aria-hidden="true"></i><span>Anterior</span>
+          </button>
+          <button class="inline-content-nav-btn next" type="button" id="inlineNavNext" aria-label="Próximo conteúdo">
+            <span>Próximo</span><i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab" data-tab="descricao">Descrição</div>
+        <div class="tab active" data-tab="desempenho">Desempenho</div>
+        <div class="tab" data-tab="relatorios">Relatórios</div>
+      </div>
+
+      <!-- ===== DESEMPENHO ===== -->
+      <section class="panel show" data-panel="desempenho">
+        <div class="kpis">
+          <div class="kpi"><div class="klbl">Aproveitamento requerido</div><div class="kval">20%</div></div>
+          <div class="kpi"><div class="klbl">Aproveitamento parcial</div><div class="kval">12.5%</div></div>
+          <div class="kpi teal"><div class="klbl">Status atual</div><div class="kval">EM ANDAMENTO</div></div>
+          <div class="kpi navy"><div class="klbl">Carga horária</div><div class="kval">01H30M</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Aproveitamento por conteúdo</h3>
+            <div class="selpill on static" role="status" aria-label="Filtro atual: Todos conteúdos">Todos conteúdos</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap">
+              <div class="yaxis"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+              <div class="plot-scroll">
+                <div class="plot" id="plot">
+                  <div class="grid-lines"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="bars" id="bars"></div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-hint" id="chartHint"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== DESCRIÇÃO ===== -->
+      <section class="panel" data-panel="descricao">
+        <div class="desc">
+          <p>Descrição preenchida via Cypress.</p>
+          <p>Este conteúdo faz parte do <strong>Treinamento Skill Suporte Lector</strong>. Conclua o vídeo e os documentos de apoio para liberar a avaliação e avançar no treinamento.</p>
+        </div>
+      </section>
+
+      <!-- ===== RELATÓRIOS ===== -->
+      <section class="panel" data-panel="relatorios">
+        <div class="toolbar">
+          <div class="tool" title="Filtros"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+          <div class="tool" title="Copiar"><i class="ui-icon icon-copy" aria-hidden="true"></i></div>
+          <div class="tool" title="Exportar Excel"><i class="ui-icon icon-file-xls" aria-hidden="true"></i></div>
+          <div class="tool" title="Exportar CSV"><i class="ui-icon icon-file-csv" aria-hidden="true"></i></div>
+          <div class="tool" title="Exportar PDF"><i class="ui-icon icon-pdf" aria-hidden="true"></i></div>
+          <div class="tool" title="Imprimir"><i class="ui-icon icon-printer" aria-hidden="true"></i></div>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:55%">Conteúdo <span class="sort">▾</span></th>
+                <th>Aproveitamento</th>
+                <th>Carga horária</th>
+                <th>Data de conclusão</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><div class="ct-inline"><span>Conteúdo 1 — <a>Boas-vindas ao Suporte Lector</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 2 — <a>Visão geral da plataforma Lector</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 3 — <a>Acesso e navegação na Minha Área</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 4 — <a>Gestão de usuários e permissões</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 5 — <a>Configurações essenciais da plataforma</a></span></div></td><td class="a-zero">0,00%</td><td>01:30:00</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 6 — <a>Avaliação — Fundamentos do Suporte Lector</a></span></div></td><td class="a-zero">20,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 7 — <a>Avaliação — Registro e classificação de chamados</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 8 — <a>Avaliação — Diagnóstico de problemas frequentes</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 9 — <a>Avaliação — Comunicação com o cliente</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 10 — <a>Avaliação — Escalonamento e resolução de chamados</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 11 — <a>Boas práticas no atendimento Lector</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><span>Conteúdo 12 — <a>Base de conhecimento do Suporte Lector</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<section class="reader-screen" aria-label="Leitor de PDF">
+  <div class="reader-top">
+    <button class="reader-back" type="button" id="readerBack" aria-label="Voltar para o treinamento">
+      <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
+      <span>Voltar para o treinamento</span>
+    </button>
+    <div class="reader-brand" aria-hidden="true">Lector<em>live</em></div>
+  </div>
+  <iframe class="reader-frame" id="pdfFrame" title="Manual Minha área"></iframe>
+  <div class="reader-video-wrap">
+    <video class="reader-video" id="videoFrame" controls playsinline></video>
+  </div>
+</section>
+
+<div class="certificate-overlay" role="dialog" aria-modal="true" aria-labelledby="certificateTitle">
+  <div class="certificate-modal">
+    <div class="certificate-modal-head">
+      <h3 id="certificateTitle">Certificado</h3>
+      <button class="certificate-close" type="button" id="certificateClose" aria-label="Fechar">
+        <i class="ui-icon icon-close" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p>Aguarde enquanto seu certificado está sendo gerado.</p>
+  </div>
+</div>
+
+<button class="sidebar-toggle" type="button" id="sidebarToggle" aria-label="Mostrar menu do treinamento">
+  <i class="ui-icon icon-menu-burger" aria-hidden="true"></i>
+</button>
+
+<script>
+  window.addEventListener('load',()=>{
+    window.setTimeout(()=>document.body.classList.add('page-loaded'), 650);
+  });
+
+  // ── tab switching ──
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  function activate(name){
+    tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+    panels.forEach(p=>p.classList.toggle('show', p.dataset.panel===name));
+    try{ localStorage.setItem('lector-trilhaA-tab', name); }catch(e){}
+    if(name==='desempenho') renderChart(currentKey);
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
+
+  // ── recolher/mostrar sidebar ──
+  const sidebarClose = document.querySelector('.side-head .closebtn');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const mobileSidebarQuery = window.matchMedia('(max-width: 900px)');
+  function syncSidebarMode(){
+    if(mobileSidebarQuery.matches) document.body.classList.add('sidebar-collapsed');
+    else document.body.classList.remove('sidebar-collapsed');
+  }
+  syncSidebarMode();
+  if(mobileSidebarQuery.addEventListener) mobileSidebarQuery.addEventListener('change', syncSidebarMode);
+  else mobileSidebarQuery.addListener(syncSidebarMode);
+  sidebarClose.addEventListener('click',()=>document.body.classList.add('sidebar-collapsed'));
+  sidebarToggle.addEventListener('click',()=>document.body.classList.remove('sidebar-collapsed'));
+
+  // ── leitor de mídias ──
+  const pdfFrame = document.getElementById('pdfFrame');
+  const inlinePdfFrame = document.getElementById('inlinePdfFrame');
+  const inlineVideoFrame = document.getElementById('inlineVideoFrame');
+  const inlineMediaTitle = document.getElementById('inlineMediaTitle');
+  const videoFrame = document.getElementById('videoFrame');
+  const readerBack = document.getElementById('readerBack');
+  const certificateClose = document.getElementById('certificateClose');
+  let certificateTimer;
+  function resetReader(){
+    pdfFrame.src = 'about:blank';
+    videoFrame.pause();
+    videoFrame.removeAttribute('src');
+    videoFrame.load();
+    document.body.classList.remove('pdf-reader','video-reader','certificate-reader');
+  }
+  function openPdfReader(src){
+    closeInlineMedia();
+    resetReader();
+    pdfFrame.src = src + '#toolbar=1&navpanes=1&view=FitH';
+    document.body.classList.add('reader-open','pdf-reader');
+  }
+  function openInlinePdf(src,title){
+    closeInlineMedia();
+    inlineMediaTitle.textContent = title || 'Boas-vindas ao Suporte Lector';
+    inlinePdfFrame.src = src + '#toolbar=1&navpanes=1&view=FitH';
+    document.body.classList.add('inline-pdf-open');
+    document.querySelector('.scroll').scrollTop = 0;
+    if(window.matchMedia('(max-width:900px)').matches){
+      document.body.classList.add('sidebar-collapsed');
+    }
+  }
+  function openInlineVideo(src,title){
+    closeInlineMedia();
+    inlineMediaTitle.textContent = title || 'Visão geral da plataforma Lector';
+    inlineVideoFrame.src = src;
+    document.body.classList.add('inline-video-open');
+    document.querySelector('.scroll').scrollTop = 0;
+    if(window.matchMedia('(max-width:900px)').matches){
+      document.body.classList.add('sidebar-collapsed');
+    }
+    inlineVideoFrame.play().catch(()=>{});
+  }
+  function closeInlineMedia(){
+    document.body.classList.remove('inline-pdf-open','inline-video-open');
+    inlinePdfFrame.src = 'about:blank';
+    inlineVideoFrame.pause();
+    inlineVideoFrame.removeAttribute('src');
+    inlineVideoFrame.load();
+  }
+  function openVideoReader(src){
+    closeInlineMedia();
+    resetReader();
+    videoFrame.src = src;
+    document.body.classList.add('reader-open','video-reader');
+  }
+  function closePdfReader(){
+    document.body.classList.remove('reader-open');
+    resetReader();
+  }
+  function closeCertificateModal(){
+    window.clearTimeout(certificateTimer);
+    document.body.classList.remove('certificate-loading');
+  }
+  function openCertificateFlow(){
+    closeCertificateModal();
+    document.body.classList.add('certificate-loading');
+    certificateTimer = window.setTimeout(()=>{
+      document.body.classList.remove('certificate-loading');
+      openPdfReader('uploads/Certificado.pdf');
+      document.body.classList.add('certificate-reader');
+    }, 1400);
+  }
+  // ── navegação anterior/próximo conteúdo ──
+  const navItems = Array.from(document.querySelectorAll('.conteudo[data-open-pdf], .conteudo[data-open-video]'));
+  let currentContentIndex = -1;
+  const inlineNavPrev = document.getElementById('inlineNavPrev');
+  const inlineNavNext = document.getElementById('inlineNavNext');
+  function updateNavButtons(){
+    inlineNavPrev.disabled = currentContentIndex <= 0;
+    inlineNavNext.disabled = currentContentIndex < 0 || currentContentIndex >= navItems.length - 1;
+  }
+  function openContentByIndex(i){
+    const item = navItems[i];
+    if(!item) return;
+    currentContentIndex = i;
+    const title = item.querySelector('.cc-name')?.textContent.trim();
+    if(item.dataset.openPdf) openInlinePdf(item.dataset.openPdf, title);
+    else if(item.dataset.openVideo) openInlineVideo(item.dataset.openVideo, title);
+    updateNavButtons();
+  }
+  inlineNavPrev.addEventListener('click',()=>openContentByIndex(currentContentIndex-1));
+  inlineNavNext.addEventListener('click',()=>openContentByIndex(currentContentIndex+1));
+
+  document.querySelectorAll('[data-open-pdf], [data-open-video]').forEach(item=>{
+    item.addEventListener('click',()=>openContentByIndex(navItems.indexOf(item)));
+    item.addEventListener('keydown',e=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        openContentByIndex(navItems.indexOf(item));
+      }
+    });
+  });
+  readerBack.addEventListener('click', closePdfReader);
+  certificateClose.addEventListener('click', closeCertificateModal);
+
+  // ── chart data ──
+  const CONTENT_VALUES = [100,100,0,0,0,20,100,100,100,100,0,0];
+  const SCROLL_AFTER = 10;   // > 10 conteúdos => scroll horizontal
+  const COL_WIDTH = 84;      // px por coluna quando há scroll
+
+  function getItems(){
+    return CONTENT_VALUES.map((v,i)=>({ label:'Conteúdo '+(i+1), v }));
+  }
+
+  function renderChart(){
+    const items = getItems();
+    const bars = document.getElementById('bars');
+    const plot = document.getElementById('plot');
+    bars.innerHTML = items.map(it=>{
+      const target = it.v===0 ? '1.5%' : it.v+'%';
+      return '<div class="bar-col"><span class="bval">'+it.v+'%</span>'
+           + '<div class="bar" data-target="'+target+'" style="height:0%"></div>'
+           + '<span class="blabel">'+it.label+'</span></div>';
+    }).join('');
+
+    // scroll when many contents
+    if(items.length > SCROLL_AFTER){ plot.style.width = (items.length*COL_WIDTH)+'px'; }
+    else { plot.style.width = ''; }
+
+    // hint
+    const hint = document.getElementById('chartHint');
+    hint.textContent = 'Mostrando ' + items.length + ' conteúdo' + (items.length>1?'s':'')
+      + (items.length > SCROLL_AFTER ? '  —  role para o lado →' : '');
+
+    // animate grow
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      bars.querySelectorAll('.bar').forEach(b=>{ b.style.height = b.dataset.target; });
+    }));
+  }
+
+  // ── init ──
+  renderChart();
+  document.querySelectorAll('.ctico').forEach(el=>{el.removeAttribute('style');el.innerHTML='<i class="ui-icon icon-checkbox-2026" aria-hidden="true"></i>';});
+  document.querySelectorAll('.conteudo:not(.locked)').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const wasChecked=el.classList.contains('checked');
+      el.classList.toggle('checked');
+      const isChecked=el.classList.contains('checked');
+      const status=el.querySelector('.cc-status');
+      const ccMid=el.querySelector('.cc-mid');
+      const hasPa=!!el.querySelector('.pa');
+      // "Não iniciado" cards: toggle status + donuts
+      if(isChecked&&!wasChecked&&status?.classList.contains('muted')&&!hasPa){
+        status.textContent='Visualizado';
+        status.classList.replace('muted','approved');
+        const pa=document.createElement('div');
+        pa.className='pa pa-new';
+        pa.dataset.dynamic='1';
+        pa.innerHTML='<span class="pa-item" style="--pct:100"><span class="lab" title="Progresso: 100%">P</span><span class="pa-pie filling">100%</span></span><span class="pa-item" style="--pct:100"><span class="lab" title="Aproveitamento: 100%">A</span><span class="pa-pie filling">100%</span></span>';
+        ccMid.insertBefore(pa,ccMid.firstChild);
+      } else if(!isChecked&&wasChecked&&status?.textContent==='Visualizado'){
+        status.textContent='Não iniciado';
+        status.classList.replace('approved','muted');
+        el.querySelector('.pa[data-dynamic]')?.remove();
+      }
+    });
+  });
+  let saved='desempenho';
+  try{ saved = localStorage.getItem('lector-trilhaA-tab') || 'desempenho'; }catch(e){}
+  activate(saved);
+  openContentByIndex(0);
+</script>
+<script>
+(function(){
+  var MOBILE_W = 420;
+  if (window.top !== window.self) return;
+  if (new URLSearchParams(location.search).get('mv') === '1') return;
+  if (window.innerWidth <= MOBILE_W) return;
+  var url = new URL(location.href);
+  url.searchParams.set('mv','1');
+  document.body.removeAttribute('class');
+  document.body.innerHTML = '';
+  document.body.style.cssText = 'margin:0;min-height:100vh;display:flex;justify-content:center;background:#e5e5e5;';
+  var frame = document.createElement('iframe');
+  frame.src = url.toString();
+  frame.title = document.title;
+  frame.style.cssText = 'border:0;width:'+MOBILE_W+'px;max-width:100vw;height:100vh;background:#fff;';
+  document.body.appendChild(frame);
+  var hideStyle = document.getElementById('mv-hide');
+  if (hideStyle) hideStyle.remove();
+  document.documentElement.style.visibility = '';
+})();
+</script>
+</body>
+</html>

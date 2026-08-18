@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Certificado</title>
+<style>
+  @page{size:A4 landscape;margin:0;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111;background:#fff;}
+  .page{width:297mm;height:210mm;position:relative;overflow:hidden;background:#fff;page-break-after:always;}
+  .page:last-child{page-break-after:auto;}
+  .frame{position:absolute;inset:16mm 16mm 14mm;border:0;background:#fff;display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .orange{position:absolute;background:#F5822A;}
+  .blue{position:absolute;background:#1F4B83;}
+  .tl{left:-30mm;top:-34mm;width:120mm;height:78mm;border-radius:0 0 70mm 0;}
+  .tr{right:-34mm;top:-18mm;width:92mm;height:58mm;border-radius:0 0 0 70mm;}
+  .br{right:-28mm;bottom:-28mm;width:104mm;height:72mm;border-radius:70mm 0 0 0;}
+  .bl{left:-34mm;bottom:-30mm;width:100mm;height:66mm;border-radius:0 70mm 0 0;}
+  .blue.tl2{left:30mm;top:-34mm;width:92mm;height:52mm;transform:skewX(-10deg);}
+  .blue.br2{right:-18mm;top:78mm;width:40mm;height:86mm;border-radius:20mm 0 0 20mm;}
+  .blue.bl2{left:-18mm;bottom:12mm;width:42mm;height:62mm;border-radius:0 24mm 24mm 0;}
+  .dot{position:absolute;width:2.2mm;height:2.2mm;border-radius:50%;background:#fff;}
+  .mark{position:absolute;color:#1F4B83;font-weight:700;opacity:.9;}
+  .line{position:absolute;width:28mm;height:1.2mm;background:#1F4B83;}
+  .logo{width:75mm;margin-top:30mm;margin-bottom:20mm;}
+  .watermark{position:absolute;left:58mm;top:82mm;font-size:72mm;font-weight:700;color:#1F4B83;opacity:.18;letter-spacing:-4mm;}
+  .watermark-live{position:absolute;right:53mm;top:125mm;font-size:22mm;font-style:italic;color:#F5822A;opacity:.22;}
+  .content{position:relative;z-index:2;font-size:7.2mm;line-height:1.5;width:210mm;margin-top:4mm;}
+  .content strong{font-weight:700;}
+  .course{font-size:8mm;font-weight:700;margin:8mm 0 4mm;}
+  .signatures{position:absolute;left:66mm;right:66mm;bottom:28mm;display:flex;justify-content:space-between;gap:24mm;z-index:2;}
+  .sig{width:70mm;text-align:center;font-size:4mm;font-weight:700;}
+  .sig .scribble{height:15mm;font-family:"Segoe Script","Brush Script MT",cursive;font-size:16mm;font-weight:400;color:#444;line-height:14mm;}
+  .sig .bar{height:.4mm;background:#555;margin-bottom:2mm;}
+  .sig small{display:block;font-size:2.8mm;font-weight:400;color:#888;margin-top:1mm;}
+  .page2 .frame{align-items:flex-start;text-align:left;padding:24mm 30mm;}
+  .page2 h1{font-size:12mm;color:#1F4B83;margin:0 0 12mm;}
+  .page2 p{font-size:5mm;line-height:1.6;margin:0 0 5mm;}
+  .box{margin-top:10mm;border:1px solid #ddd;border-radius:4mm;padding:10mm;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8mm;}
+  .field span{display:block;font-size:3.5mm;color:#777;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1mm;}
+  .field b{font-size:5mm;}
+</style>
+</head>
+<body>
+  <section class="page">
+    <div class="orange tl"></div><div class="orange tr"></div><div class="orange br"></div><div class="orange bl"></div>
+    <div class="blue tl2"></div><div class="blue br2"></div><div class="blue bl2"></div>
+    <span class="dot" style="left:128mm;top:28mm"></span><span class="dot" style="left:139mm;top:27mm"></span><span class="dot" style="left:150mm;top:25mm"></span>
+    <span class="dot" style="right:36mm;top:100mm"></span><span class="dot" style="right:34mm;top:114mm"></span><span class="dot" style="right:31mm;top:126mm"></span>
+    <span class="line" style="right:18mm;top:28mm"></span><span class="line" style="right:26mm;top:38mm"></span>
+    <span class="line" style="left:18mm;top:86mm"></span><span class="line" style="right:18mm;bottom:24mm"></span><span class="line" style="right:26mm;bottom:34mm"></span>
+    <div class="frame">
+      <img class="logo" src="assets/logo-lector.svg" alt="Lector tecnologia">
+      <div class="watermark">Lector</div>
+      <div class="watermark-live">live</div>
+      <div class="content">
+        <div>O aluno <strong>Caio gomes</strong>, sob o CPF&nbsp;&nbsp;, concluiu o treinamento</div>
+        <div class="course">Trilha Completa Automação,</div>
+        <div>com aproveitamento de <strong>100.00%,</strong></div>
+        <div style="margin-top:8mm;">no dia <strong>02 de junho de 2026.</strong></div>
+      </div>
+      <div class="signatures">
+        <div class="sig">
+          <div class="scribble"></div>
+          <div class="bar"></div>
+          <strong>Caio gomes</strong>
+        </div>
+        <div class="sig">
+          <div class="scribble">Lector</div>
+          <div class="bar"></div>
+          <strong>CARLOS EDUARDO DONINI</strong>
+          <small>TREINAMENTOS</small>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="page page2">
+    <div class="orange tr"></div><div class="blue bl2"></div>
+    <div class="frame">
+      <img src="assets/logo-lector.svg" alt="Lector tecnologia" style="width:48mm;margin-bottom:18mm;">
+      <h1>Validação do certificado</h1>
+      <p>Este certificado foi emitido para comprovar a conclusão da trilha no ambiente de treinamento.</p>
+      <p>Guarde este documento para consulta e conferência das informações de conclusão.</p>
+      <div class="box">
+        <div class="field"><span>Aluno</span><b>Caio gomes</b></div>
+        <div class="field"><span>Trilha</span><b>Trilha Completa Automação</b></div>
+        <div class="field"><span>Progresso</span><b>100%</b></div>
+        <div class="field"><span>Aproveitamento</span><b>100.00%</b></div>
+        <div class="field"><span>Data de emissão</span><b>02/06/2026</b></div>
+        <div class="field"><span>Status</span><b>Concluído</b></div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

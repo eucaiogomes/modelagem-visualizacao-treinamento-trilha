@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trilha Completa Automação — Desempenho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/lector-icons/css/lector-icons.css">
+<style>
+  :root{
+    --orange:#E87722; --orange-dark:#C4611A; --orange-subtle:#FDF0E6;
+    --teal:#1B8CA6; --teal-light:#E4F4F8;
+    --green:#3D8A52; --green-light:#EAF6EE; --success:#2E7D32;
+    --navy:#1C4B82; --navy-light:#E4EBF5;
+    --warn:#B45309; --warn-light:#FEF8EC;
+    --n0:#fff; --n50:#F9F9F9; --n100:#F5F5F5; --n200:#EBEBEB; --n300:#E0E0E0;
+    --n400:#CCCCCC; --n500:#999999; --n600:#666666; --n700:#444444; --n900:#1A1A1A;
+    --ink:#1A1A1A; --muted:#666; --sub:#999;
+    --sans:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+    --r-sm:4px; --r-md:6px; --r-lg:8px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+    --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{font-family:var(--sans);color:var(--ink);background:var(--n100);font-size:14px;-webkit-font-smoothing:antialiased;}
+  .ui-icon{display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none;}
+  .ui-icon:before{width:auto;margin:0;}
+  .ui-teal{color:var(--teal);}
+  .ui-orange{color:var(--orange);}
+  .ui-warn{color:var(--warn);}
+  .ui-green{color:var(--green);}
+  .ui-navy{color:var(--navy);}
+  .app{display:flex;height:100vh;background:var(--n0);overflow:hidden;}
+
+  /* ───── Left rail (hover to expand) ───── */
+  .rail{
+    width:84px; flex:none; background:var(--n50); border-right:1px solid var(--n300);
+    display:flex; flex-direction:column; align-items:stretch;
+    transition:width .22s ease; overflow:hidden; z-index:30;
+  }
+  .rail:hover{ width:252px; box-shadow:var(--shadow-md); }
+  .rail-top{ padding:16px 0 14px; display:flex; justify-content:center; align-items:center; border-bottom:1px solid var(--n200);}
+  .closebtn{ width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center; box-shadow:0 2px 6px rgba(232,119,34,.35); transition:background .12s;}
+  .closebtn:hover{background:var(--orange-dark);}
+  .closebtn .ui-icon{font-size:22px;}
+  .rail-title{ padding:14px 18px 6px; opacity:0; transition:opacity .15s; white-space:nowrap; }
+  .rail:hover .rail-title{opacity:1;}
+  .rail-title .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);}
+  .rail-title .t{font-size:15px;font-weight:700;color:var(--ink);margin-top:2px;}
+
+  .steps{ padding:8px 0; flex:1; }
+  .step{ display:flex; align-items:center; gap:14px; padding:9px 0 9px 24px; cursor:pointer; position:relative; transition:background .12s;}
+  .step:hover{background:var(--n100);}
+  .step.active{background:var(--orange-subtle);}
+  .step.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange);}
+  .node{ width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;border:2px solid var(--n400);color:var(--n600);background:#fff;}
+  .node .ui-icon{font-size:14px;}
+  .step.done .node{ background:var(--green-light); border-color:var(--green); color:var(--green);}
+  .step.active .node{ background:var(--orange); border-color:var(--orange); color:#fff;}
+  .step-text{ opacity:0; transition:opacity .15s; white-space:nowrap; }
+  .rail:hover .step-text{opacity:1;}
+  .step-text .et{font-size:14px;font-weight:600;color:var(--ink);}
+  .step-text .meta{font-size:12px;color:var(--sub);margin-top:1px;}
+  .step.active .step-text .et{color:var(--orange-dark);}
+  .rail-foot{ padding:12px 0; border-top:1px solid var(--n200); display:flex; align-items:center; gap:12px; padding-left:26px; color:var(--sub); cursor:pointer; }
+  .rail-foot:hover{color:var(--muted);}
+  .rail-foot span{opacity:0;transition:opacity .15s;font-size:13px;white-space:nowrap;}
+  .rail:hover .rail-foot span{opacity:1;}
+  .chev-exp{transition:transform .22s;}
+  .chev-exp.ui-icon{font-size:18px;}
+  .rail:hover .chev-exp{transform:rotate(180deg);}
+
+  /* ───── Main column ───── */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .topbar{
+    height:56px;flex:none;display:flex;align-items:center;gap:14px;
+    padding:0 24px;border-bottom:1px solid var(--n300);background:#fff;
+  }
+  .btn-accent{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--orange);background:#fff;color:var(--orange);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;}
+  .btn-accent:hover{background:var(--orange-subtle);}
+  .btn-accent.center.middle{align-items:center;justify-content:center;}
+  .btn-accent[class*=" icon-"]:before{width:auto;margin:0;font-size:18px;line-height:1;}
+  .crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap;min-width:0;}
+  .crumbs .sep{color:var(--n400);}
+  .crumbs a{color:var(--muted);text-decoration:none;cursor:pointer;}
+  .crumbs a:hover{color:var(--orange);}
+  .crumbs .cur{color:var(--orange);font-weight:600;}
+  .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:16px;}
+  .iconbtn{color:var(--sub);cursor:pointer;display:flex;}
+  .iconbtn:hover{color:var(--muted);}
+  .iconbtn .ui-icon{font-size:18px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;cursor:pointer;}
+
+  .scroll{flex:1;overflow-y:auto;}
+  .pagehead{padding:22px 32px 0;}
+  .pagehead h1{font-size:26px;font-weight:600;margin:0;color:var(--ink);}
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:16px;position:sticky;top:0;background:#fff;z-index:10;}
+  .tab{padding:11px 0;margin-right:28px;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:color .12s;white-space:nowrap;}
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:var(--orange);font-weight:600;border-bottom-color:var(--orange);}
+
+  .panel{padding:24px 32px 56px;display:none;}
+  .panel.show{display:block;animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  /* ───── Hero ───── */
+  .hero{display:flex;align-items:center;gap:22px;padding:20px 22px;background:#fff;border:1px solid var(--n300);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);margin-bottom:18px;}
+  .ring{ --p:26; width:84px;height:84px;flex:none;border-radius:50%;position:relative;
+    background:conic-gradient(var(--orange) calc(var(--p)*1%), var(--n200) 0);}
+  .ring::after{content:'';position:absolute;inset:8px;background:#fff;border-radius:50%;}
+  .ring b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;}
+  .ring .pv{font-size:22px;font-weight:700;color:var(--ink);line-height:1;}
+  .ring .pl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);margin-top:2px;}
+  .hero-info{flex:1;min-width:0;}
+  .hero-info h2{font-size:22px;font-weight:600;margin:0 0 6px;color:var(--ink);}
+  .hero-meta{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);flex-wrap:wrap;}
+  .statusdot{display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-weight:600;}
+  .statusdot i{width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;}
+  .btn{font-family:var(--sans);font-size:14px;font-weight:600;border-radius:var(--r-sm);cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border:none;transition:background .12s;white-space:nowrap;}
+  .btn.primary{background:var(--orange);color:#fff;}
+  .btn.primary:hover{background:var(--orange-dark);}
+  .btn.outline{background:#fff;color:var(--orange);border:1.5px solid var(--orange);}
+  .btn.outline:hover{background:var(--orange-subtle);}
+  .btn .ui-icon{font-size:16px;}
+
+  /* ───── KPI cards ───── */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px;}
+  .kpi{background:#fff;border:1px solid var(--n300);border-top:3px solid var(--orange);border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--shadow-sm);}
+  .kpi.teal{border-top-color:var(--teal);}
+  .kpi.navy{border-top-color:var(--navy);}
+  .kpi .klbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--sub);}
+  .kpi .kval{font-size:28px;font-weight:700;color:var(--ink);margin-top:8px;line-height:1;}
+  .kpi.teal .kval{color:var(--teal);font-size:20px;}
+  .kpi.navy .kval{color:var(--navy);}
+  .kpi .ksub{font-size:12px;color:var(--muted);margin-top:6px;}
+
+  /* ───── two-col ───── */
+  .cols{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
+  .card{background:#fff;border:1px solid var(--n300);border-radius:var(--r-md);box-shadow:var(--shadow-sm);}
+  .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--n200);}
+  .card-head h3{font-size:16px;font-weight:600;margin:0;color:var(--ink);}
+  .card-body{padding:18px;}
+  .selpill{font-size:12px;font-weight:600;color:var(--muted);background:var(--n100);border:1px solid var(--n300);border-radius:var(--r-sm);padding:5px 10px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+  .selpill .ui-icon{font-size:13px;}
+
+  /* chart */
+  .chart-wrap{display:flex;gap:10px;}
+  .yaxis{display:flex;flex-direction:column;justify-content:space-between;height:240px;padding-bottom:26px;font-size:11px;color:var(--sub);text-align:right;width:30px;flex:none;}
+  .plot{flex:1;position:relative;}
+  .grid-lines{position:absolute;inset:0 0 26px 0;display:flex;flex-direction:column;justify-content:space-between;}
+  .grid-lines i{border-top:1px solid var(--n200);height:0;}
+  .bars{position:relative;display:flex;align-items:flex-end;gap:24px;height:240px;padding-bottom:26px;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;}
+  .bar{width:64%;max-width:72px;background:var(--orange);border-radius:4px 4px 0 0;transition:height .6s cubic-bezier(.2,.7,.2,1),background .12s;cursor:pointer;position:relative;}
+  .bar-col:hover .bar{background:var(--orange-dark);}
+  .bar-col .blabel{position:absolute;bottom:0;font-size:12px;color:var(--muted);font-weight:500;}
+  .bar-col .bval{position:absolute;top:-22px;font-size:13px;font-weight:700;color:var(--orange-dark);opacity:0;transition:opacity .12s;}
+  .bar-col:hover .bval{opacity:1;}
+
+  /* próximos conteúdos */
+  .clist{display:flex;flex-direction:column;}
+  .citem{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--n200);}
+  .citem:last-child{border-bottom:none;}
+  .ctico{width:34px;height:34px;border-radius:var(--r-sm);flex:none;display:flex;align-items:center;justify-content:center;}
+  .ctico .ui-icon{font-size:20px;}
+  .ctmid{flex:1;min-width:0;}
+  .ctmid .ctt{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ctmid .cty{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);margin-bottom:2px;}
+  .badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--r-sm);white-space:nowrap;flex:none;}
+  .badge.done{background:var(--green-light);color:var(--success);}
+  .badge.todo{background:var(--orange-subtle);color:var(--orange-dark);}
+  .badge.locked{background:var(--n100);color:var(--n500);display:inline-flex;align-items:center;gap:5px;}
+  .badge .ui-icon{font-size:11px;}
+
+  /* ───── Descrição panel ───── */
+  .desc{max-width:720px;}
+  .desc p{font-size:14px;line-height:1.6;color:var(--n700);margin:0 0 14px;}
+  .etapa-overview{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px;}
+  .eo-card{border:1px solid var(--n300);border-radius:var(--r-md);padding:14px 16px;display:flex;align-items:center;gap:12px;}
+  .eo-card .node{width:30px;height:30px;font-size:13px;}
+  .eo-card .eo-t{font-size:14px;font-weight:600;color:var(--ink);}
+  .eo-card .eo-m{font-size:12px;color:var(--sub);}
+
+  /* ───── Relatórios panel ───── */
+  .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .tool{width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s;box-shadow:0 2px 5px rgba(232,119,34,.28);}
+  .tool:hover{background:var(--orange-dark);}
+  .tool .ui-icon{font-size:18px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);padding:12px 14px;border-bottom:2px solid var(--n300);}
+  th .sort{color:var(--orange);margin-left:4px;}
+  td{padding:14px;border-bottom:1px solid var(--n200);color:var(--n700);vertical-align:middle;}
+  tr:hover td{background:var(--n50);}
+  td.a-good{color:var(--success);font-weight:600;}
+  td.a-zero{color:var(--n500);}
+  .ct-inline{display:flex;align-items:center;gap:10px;}
+  .ct-inline .ctico .ui-icon{font-size:15px;}
+  .ct-inline a{color:var(--orange);text-decoration:none;}
+  .ct-inline a:hover{text-decoration:underline;}
+
+  @media (max-width:1080px){
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .cols{grid-template-columns:1fr;}
+    .etapa-overview{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ───────── LEFT RAIL ───────── -->
+  <aside class="rail" aria-label="Etapas da trilha">
+    <div class="rail-top">
+      <button class="closebtn" title="Sair da trilha" aria-label="Sair da trilha">
+        <i class="ui-icon icon-close" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="rail-title">
+      <div class="lbl">Trilha</div>
+      <div class="t">Trilha Completa Automação</div>
+    </div>
+    <div class="steps">
+      <div class="step done" title="Etapa 1">
+        <div class="node"><i class="ui-icon icon-checked" aria-hidden="true"></i></div>
+        <div class="step-text"><div class="et">Etapa 1</div><div class="meta">6 conteúdos · concluída</div></div>
+      </div>
+      <div class="step active" title="Etapa 2 — atual">
+        <div class="node">2</div>
+        <div class="step-text"><div class="et">Etapa 2</div><div class="meta">2 de 4 concluídos</div></div>
+      </div>
+      <div class="step" title="Etapa 3">
+        <div class="node">3</div>
+        <div class="step-text"><div class="et">Etapa 3</div><div class="meta">5 conteúdos</div></div>
+      </div>
+      <div class="step" title="Etapa 4">
+        <div class="node">4</div>
+        <div class="step-text"><div class="et">Etapa 4</div><div class="meta">8 conteúdos</div></div>
+      </div>
+    </div>
+    <div class="rail-foot" title="Expandir">
+      <i class="ui-icon icon-right-open chev-exp" aria-hidden="true"></i>
+      <span>Recolher etapas</span>
+    </div>
+  </aside>
+
+  <!-- ───────── MAIN ───────── -->
+  <div class="main">
+    <div class="topbar">
+      <button id="hideResource" ng-if="!showFinishtrail()" ng-click="hideResource()" class="btn-accent icon-undo center middle ng-scope" title="Voltar" aria-label="Voltar"></button>
+      <nav class="crumbs">
+        <a>Vitrine</a><span class="sep">›</span>
+        <a>Teste Automação</a><span class="sep">›</span>
+        <a>Minha Área</a><span class="sep">›</span>
+        <a>Minhas Trilhas</a><span class="sep">›</span>
+        <span class="cur">Trilha Completa Automação</span>
+      </nav>
+      <div class="topbar-actions">
+        <span class="iconbtn" title="Buscar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <span class="iconbtn" title="Notificações"><i class="ui-icon icon-bell" aria-hidden="true"></i></span>
+        <div class="avatar">P</div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="pagehead">
+        <h1>Desempenho da trilha</h1>
+      </div>
+      <div class="tabs">
+        <div class="tab" data-tab="descricao">Descrição</div>
+        <div class="tab active" data-tab="desempenho">Desempenho</div>
+        <div class="tab" data-tab="relatorios">Relatórios</div>
+      </div>
+
+      <!-- ===== DESEMPENHO ===== -->
+      <section class="panel show" data-panel="desempenho">
+        <div class="hero">
+          <div class="ring" style="--p:26;"><b><span class="pv">26%</span><span class="pl">Progresso</span></b></div>
+          <div class="hero-info">
+            <h2>Trilha Completa Automação</h2>
+            <div class="hero-meta">
+              <span>Etapa 2 de 4</span><span class="sep" style="color:var(--n400)">·</span>
+              <span>4 de 23 conteúdos concluídos</span><span class="sep" style="color:var(--n400)">·</span>
+              <span class="statusdot"><i></i>Em andamento</span>
+            </div>
+          </div>
+          <button class="btn primary">
+            Continuar de onde parei
+            <i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="klbl">Aproveitamento requerido</div><div class="kval">20%</div><div class="ksub">mínimo para aprovação</div></div>
+          <div class="kpi"><div class="klbl">Aproveitamento parcial</div><div class="kval">12.5%</div><div class="ksub">faltam 7,5 pontos</div></div>
+          <div class="kpi teal"><div class="klbl">Status atual</div><div class="kval">EM ANDAMENTO</div><div class="ksub">iniciada em 12/05/2026</div></div>
+          <div class="kpi navy"><div class="klbl">Carga horária</div><div class="kval">01H30M</div><div class="ksub">de 06H00M totais</div></div>
+        </div>
+
+        <div class="cols">
+          <!-- chart -->
+          <div class="card">
+            <div class="card-head">
+              <h3>Aproveitamento por etapa</h3>
+              <span class="selpill">Todas as etapas
+                <i class="ui-icon icon-pointer-down" aria-hidden="true"></i>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap">
+                <div class="yaxis"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+                <div class="plot">
+                  <div class="grid-lines"><i></i><i></i><i></i><i></i><i></i></div>
+                  <div class="bars">
+                    <div class="bar-col"><span class="bval">100%</span><div class="bar" style="height:100%" data-h="100"></div><span class="blabel">Etapa 1</span></div>
+                    <div class="bar-col"><span class="bval">56%</span><div class="bar" style="height:56%" data-h="56"></div><span class="blabel">Etapa 2</span></div>
+                    <div class="bar-col"><span class="bval">12%</span><div class="bar" style="height:12%" data-h="12"></div><span class="blabel">Etapa 3</span></div>
+                    <div class="bar-col"><span class="bval">0%</span><div class="bar" style="height:1.5%" data-h="0"></div><span class="blabel">Etapa 4</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- próximos conteúdos -->
+          <div class="card">
+            <div class="card-head">
+              <h3>Próximos conteúdos</h3>
+              <span class="selpill" style="background:var(--orange-subtle);border-color:#f0c79a;color:var(--orange-dark)">Etapa 2</span>
+            </div>
+            <div class="card-body" style="padding-top:6px;padding-bottom:6px;">
+              <div class="clist">
+                <div class="citem">
+                  <div class="ctico" style="background:var(--orange-subtle)"><i class="ui-icon icon-play-media ui-orange" aria-hidden="true"></i></div>
+                  <div class="ctmid"><div class="cty">Vídeo</div><div class="ctt">Introdução à Automação de Processos</div></div>
+                  <span class="badge done">100%</span>
+                </div>
+                <div class="citem">
+                  <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
+                  <div class="ctmid"><div class="cty">Documentos</div><div class="ctt">Manual Lector 2026/02 — Social.pdf</div></div>
+                  <span class="badge todo">Continuar</span>
+                </div>
+                <div class="citem">
+                  <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
+                  <div class="ctmid"><div class="cty">Avaliação</div><div class="ctt">Prova de Conhecimentos — Etapa 2</div></div>
+                  <span class="badge todo">A fazer</span>
+                </div>
+                <div class="citem">
+                  <div class="ctico" style="background:var(--green-light)"><i class="ui-icon icon-certificate ui-green" aria-hidden="true"></i></div>
+                  <div class="ctmid"><div class="cty">Certificado</div><div class="ctt">Emissão de Certificado</div></div>
+                  <span class="badge locked"><i class="ui-icon icon-lock-closed" aria-hidden="true"></i>Bloqueado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== DESCRIÇÃO ===== -->
+      <section class="panel" data-panel="descricao">
+        <div class="desc">
+          <h3 style="font-size:18px;font-weight:600;margin:0 0 12px;color:var(--ink);">Sobre a trilha</h3>
+          <p>A <strong>Trilha Completa Automação</strong> reúne os conteúdos essenciais para capacitar sua equipe na automação de processos corporativos. Ao longo de quatro etapas, o colaborador percorre vídeos, materiais de apoio, atividades práticas e avaliações até a emissão do certificado.</p>
+          <p>O aproveitamento mínimo exigido para aprovação é de <strong>20%</strong>, e a carga horária total estimada é de <strong>6 horas</strong>. O progresso é registrado automaticamente à medida que cada conteúdo é concluído.</p>
+          <h3 style="font-size:18px;font-weight:600;margin:24px 0 12px;color:var(--ink);">Etapas</h3>
+          <div class="etapa-overview">
+            <div class="eo-card"><div class="node" style="background:var(--green-light);border-color:var(--green);color:var(--green)"><i class="ui-icon icon-checked" aria-hidden="true"></i></div><div><div class="eo-t">Etapa 1 — Fundamentos</div><div class="eo-m">6 conteúdos · concluída</div></div></div>
+            <div class="eo-card" style="border-color:var(--orange);background:var(--orange-subtle)"><div class="node" style="background:var(--orange);border-color:var(--orange);color:#fff">2</div><div><div class="eo-t">Etapa 2 — Ferramentas</div><div class="eo-m">2 de 4 concluídos · atual</div></div></div>
+            <div class="eo-card"><div class="node">3</div><div><div class="eo-t">Etapa 3 — Práticas</div><div class="eo-m">5 conteúdos</div></div></div>
+            <div class="eo-card"><div class="node">4</div><div><div class="eo-t">Etapa 4 — Avaliação final</div><div class="eo-m">8 conteúdos</div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== RELATÓRIOS ===== -->
+      <section class="panel" data-panel="relatorios">
+        <div class="toolbar">
+          <div class="tool" title="Filtros"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+          <div class="tool" title="Copiar"><i class="ui-icon icon-copy" aria-hidden="true"></i></div>
+          <div class="tool" title="Exportar Excel"><i class="ui-icon icon-file-xls" aria-hidden="true"></i></div>
+          <div class="tool" title="Exportar CSV"><i class="ui-icon icon-file-csv" aria-hidden="true"></i></div>
+          <div class="tool" title="Exportar PDF"><i class="ui-icon icon-pdf" aria-hidden="true"></i></div>
+          <div class="tool" title="Imprimir"><i class="ui-icon icon-printer" aria-hidden="true"></i></div>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:55%">Conteúdo <span class="sort">▾</span></th>
+                <th>Aproveitamento</th>
+                <th>Carga horária</th>
+                <th>Data de conclusão</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div><span>Conteúdo 1 — <a>Manual Lector 2026/01 — Minha área.pdf</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--teal-light)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14,2H6a2,2,0,0,0-2,2v16a2,2,0,0,0,2,2h12a2,2,0,0,0,2-2V8Z"/><polyline points="14,2 14,8 20,8"/></svg></div><span>Conteúdo 2 — <a>Linguagens-de-Programacao (2).webp</a></span></div></td><td class="a-good">100,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--teal-light)"><i class="ui-icon icon-png ui-teal" aria-hidden="true"></i></div><span>Conteúdo 3 — <a>qrcode lista de presença — Presencial.png</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div><span>Conteúdo 4 — <a>Manual Lector 2026/02 — Social.pdf</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--orange-subtle)"><i class="ui-icon icon-play-media ui-orange" aria-hidden="true"></i></div><span>Conteúdo 5 — <a>Treinamento Trilha Automação 1</a></span></div></td><td class="a-zero">0,00%</td><td>01:30:00</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div><span>Conteúdo 6 — <a>todas na mesma página Thiago</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div><span>Conteúdo 7 — <a>uma por página Thiago</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+              <tr><td><div class="ct-inline"><div class="ctico" style="width:26px;height:26px;background:var(--navy-light)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21,16V8a2,2,0,0,0-1-1.73l-7-4a2,2,0,0,0-2,0l-7,4A2,2,0,0,0,3,8v8a2,2,0,0,0,1,1.73l7,4a2,2,0,0,0,2,0l7-4A2,2,0,0,0,21,16z"/></svg></div><span>Conteúdo 8 — <a>Apresentação faculdade 14.07.pptx</a></span></div></td><td class="a-zero">0,00%</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // tab switching
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  const heading = document.querySelector('.pagehead h1');
+  const titles = { descricao:'Descrição', desempenho:'Desempenho da trilha', relatorios:'Relatórios' };
+  function activate(name){
+    tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+    panels.forEach(p=>p.classList.toggle('show', p.dataset.panel===name));
+    if(heading) heading.textContent = titles[name] || 'Trilha';
+    try{ localStorage.setItem('lector-trilha-tab', name); }catch(e){}
+    // re-trigger bar grow animation when entering desempenho
+    if(name==='desempenho') growBars();
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
+
+  // bar grow animation
+  function growBars(){
+    document.querySelectorAll('.bar').forEach(b=>{
+      const h = b.dataset.h; const target = h==='0' ? '1.5%' : h+'%';
+      b.style.height='0%';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ b.style.height=target; }));
+    });
+  }
+
+  // restore tab
+  let saved='desempenho';
+  try{ saved = localStorage.getItem('lector-trilha-tab') || 'desempenho'; }catch(e){}
+  activate(saved);
+</script>
+</body>
+</html>
