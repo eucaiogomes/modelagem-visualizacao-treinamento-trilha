@@ -826,19 +826,23 @@
 
   // ── arrastar com o mouse para rolar as abas (toque já rola nativamente) ──
   if(tabsEl){
-    let dragActive = false, dragMoved = false, dragStartX = 0, dragStartScroll = 0;
+    let dragActive = false, dragMoved = false, dragStartX = 0, dragStartScroll = 0, dragStartTime = 0;
     tabsEl.addEventListener('pointerdown', (e)=>{
       if(e.pointerType !== 'mouse') return;
       dragActive = true; dragMoved = false;
       dragStartX = e.clientX;
       dragStartScroll = tabsEl.scrollLeft;
+      dragStartTime = Date.now();
       tabsEl.setPointerCapture(e.pointerId);
       tabsEl.classList.add('dragging');
     });
     tabsEl.addEventListener('pointermove', (e)=>{
       if(!dragActive) return;
       const dx = e.clientX - dragStartX;
-      if(Math.abs(dx) > 10) dragMoved = true;
+      // Só conta como arraste se o movimento for real (>18px) E sustentado no tempo
+      // (>120ms); um clique com pequeno tremor do mouse/trackpad é rápido e não deve
+      // ser descartado como se fosse um arraste.
+      if(Math.abs(dx) > 18 && (Date.now() - dragStartTime) > 120) dragMoved = true;
       tabsEl.scrollLeft = dragStartScroll - dx;
     });
     function endTabsDrag(){
