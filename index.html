@@ -179,8 +179,7 @@
   body.inline-video-open .inline-pdf-frame{display:none;}
   body.inline-video-open .inline-video-frame{display:block;}
   .tabs-wrap{position:relative;}
-  .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;cursor:grab;user-select:none;}
-  .tabs.dragging{cursor:grabbing;}
+  .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;}
   .tab{padding:11px 0;margin-right:28px;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:color .12s;white-space:nowrap;}
   .tab:hover{color:var(--ink);}
   .tab.active{color:var(--orange);font-weight:600;border-bottom-color:var(--orange);}
@@ -1078,40 +1077,6 @@
   }
   if(tabsPrevBtn) tabsPrevBtn.addEventListener('click', ()=>scrollTabsBy(-1));
   if(tabsNextBtn) tabsNextBtn.addEventListener('click', ()=>scrollTabsBy(1));
-
-  // ── arrastar com o mouse para rolar as abas (toque já rola nativamente) ──
-  if(tabsEl){
-    let dragActive = false, dragMoved = false, dragStartX = 0, dragStartScroll = 0, dragStartTime = 0;
-    tabsEl.addEventListener('pointerdown', (e)=>{
-      if(e.pointerType !== 'mouse') return;
-      dragActive = true; dragMoved = false;
-      dragStartX = e.clientX;
-      dragStartScroll = tabsEl.scrollLeft;
-      dragStartTime = Date.now();
-      tabsEl.setPointerCapture(e.pointerId);
-      tabsEl.classList.add('dragging');
-    });
-    tabsEl.addEventListener('pointermove', (e)=>{
-      if(!dragActive) return;
-      const dx = e.clientX - dragStartX;
-      // Só conta como arraste se o movimento for real (>18px) E sustentado no tempo
-      // (>120ms); um clique com pequeno tremor do mouse/trackpad é rápido e não deve
-      // ser descartado como se fosse um arraste.
-      if(Math.abs(dx) > 18 && (Date.now() - dragStartTime) > 120) dragMoved = true;
-      tabsEl.scrollLeft = dragStartScroll - dx;
-    });
-    function endTabsDrag(){
-      if(!dragActive) return;
-      dragActive = false;
-      tabsEl.classList.remove('dragging');
-    }
-    tabsEl.addEventListener('pointerup', endTabsDrag);
-    tabsEl.addEventListener('pointercancel', endTabsDrag);
-    tabsEl.addEventListener('pointerleave', endTabsDrag);
-    tabsEl.addEventListener('click', (e)=>{
-      if(dragMoved){ e.stopPropagation(); dragMoved = false; }
-    }, true);
-  }
 
   // ── recolher/mostrar sidebar ──
   const sidebarClose = document.querySelector('.side-head .closebtn');
