@@ -183,6 +183,21 @@
   .trail-cover img{display:block;width:100%;height:100%;object-fit:cover;}
   .trail-copy{min-width:0;flex:1;}
   .trail-copy h2{font-size:22px;font-weight:700;margin:0;color:#111;line-height:1.2;}
+  .inline-media-reader{display:none;height:clamp(520px,calc(100vh - 150px),820px);min-height:0;background:#252525;border:1px solid #dcdcdc;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.14);overflow:hidden;flex-direction:column;}
+  body.inline-pdf-open .trail-summary,body.inline-video-open .trail-summary{display:none;}
+  body.inline-pdf-open .inline-media-reader,body.inline-video-open .inline-media-reader{display:flex;}
+  .inline-pdf-head{height:44px;flex:none;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;padding:0 16px;}
+  .inline-pdf-title{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .inline-content-nav{display:none;justify-content:space-between;align-items:center;margin-top:10px;}
+  body.inline-pdf-open .inline-content-nav,body.inline-video-open .inline-content-nav{display:flex;}
+  .inline-content-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:0;background:var(--orange);color:#fff;cursor:pointer;transition:.12s;}
+  .inline-content-nav-btn:hover{background:var(--orange-dark);}
+  .inline-content-nav-btn:disabled{opacity:.35;cursor:default;pointer-events:none;}
+  .inline-content-nav-btn .ui-icon{font-size:15px;}
+  .inline-pdf-frame{width:100%;flex:1;min-height:0;border:0;background:#252525;}
+  .inline-video-frame{display:none;width:100%;flex:1;min-height:0;background:#111;object-fit:contain;}
+  body.inline-video-open .inline-pdf-frame{display:none;}
+  body.inline-video-open .inline-video-frame{display:block;}
   .tabs-wrap{position:relative;}
   .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;cursor:grab;user-select:none;}
   .tabs.dragging{cursor:grabbing;}
@@ -355,6 +370,8 @@
     .mobile-crumbs .sep{color:var(--n400);}
     .mobile-crumbs .cur{color:var(--orange);font-weight:600;}
     .pagehead{display:none;}
+    body.inline-pdf-open .pagehead,body.inline-video-open .pagehead{display:block;padding:10px 10px 0;}
+    .inline-media-reader{height:calc(100vh - 72px);min-height:480px;}
     .scroll{overflow:visible;}
     .tabs{top:56px;overflow-x:auto;scrollbar-width:none;}
     .tabs::-webkit-scrollbar{display:none;}
@@ -519,19 +536,19 @@
               <div class="cc-meta-row"><div class="cc-status progress">Em andamento</div></div>
             </div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-png ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="qrcode lista de presença — Presencial.png">qrcode lista de presença — Presencial.png</div><div class="cc-type">Documento</div><div class="cc-status muted">Não visualizado</div></div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="Manual Lector 2026/02 — Social.pdf">Manual Lector 2026/02 — Social.pdf</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="Menu validação de termos — Trilhas.pdf">Menu validação de termos — Trilhas.pdf</div><div class="cc-type">Documento</div><div class="cc-status muted">Não visualizado</div></div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-avaliacao="avaliacao.html" role="button" tabindex="0">
             <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-file-xls ui-warn" aria-hidden="true"></i></div>
             <div class="cc-mid">
               <div class="cc-try">Tentativa 1/2</div>
@@ -586,11 +603,11 @@
           <span class="chev"><i class="ui-icon icon-pointer-down" aria-hidden="true"></i></span>
         </div>
         <div class="etapa-body">
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico"></div>
             <div class="cc-mid"><div class="cc-name" title="Checklist - HML - Mika (4).xlsx">Checklist - HML - Mika (4).xlsx</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico"></div>
             <div class="cc-mid"><div class="cc-name" title="Apresentação faculdade socialização 14.07 2 (7).pptx">Apresentação faculdade socialização 14.07 2 (7).pptx</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
           </div>
@@ -625,6 +642,21 @@
             <h2>Trilha Completa Automação</h2>
           </div>
         </section>
+        <section class="inline-media-reader" aria-label="Conteúdo da trilha">
+          <div class="inline-pdf-head">
+            <strong class="inline-pdf-title" id="inlineMediaTitle">Conteúdo 1</strong>
+          </div>
+          <iframe class="inline-pdf-frame" id="inlinePdfFrame" title="Conteúdo 1"></iframe>
+          <video class="inline-video-frame" id="inlineVideoFrame" controls playsinline></video>
+        </section>
+        <div class="inline-content-nav">
+          <button class="inline-content-nav-btn prev" type="button" id="inlineNavPrev" aria-label="Conteúdo anterior">
+            <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
+          </button>
+          <button class="inline-content-nav-btn next" type="button" id="inlineNavNext" aria-label="Próximo conteúdo">
+            <i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
       <div class="tabs-wrap">
         <div class="tabs">
@@ -806,7 +838,7 @@
     tabsEl.addEventListener('pointermove', (e)=>{
       if(!dragActive) return;
       const dx = e.clientX - dragStartX;
-      if(Math.abs(dx) > 4) dragMoved = true;
+      if(Math.abs(dx) > 10) dragMoved = true;
       tabsEl.scrollLeft = dragStartScroll - dx;
     });
     function endTabsDrag(){
@@ -838,6 +870,9 @@
 
   // ── leitor de mídias ──
   const pdfFrame = document.getElementById('pdfFrame');
+  const inlinePdfFrame = document.getElementById('inlinePdfFrame');
+  const inlineVideoFrame = document.getElementById('inlineVideoFrame');
+  const inlineMediaTitle = document.getElementById('inlineMediaTitle');
   const videoFrame = document.getElementById('videoFrame');
   const readerBack = document.getElementById('readerBack');
   const sideFinish = document.querySelector('.side-finish');
@@ -851,11 +886,41 @@
     document.body.classList.remove('pdf-reader','video-reader','certificate-reader');
   }
   function openPdfReader(src){
+    closeInlineMedia();
     resetReader();
     pdfFrame.src = src + '#toolbar=1&navpanes=1&view=FitH';
     document.body.classList.add('reader-open','pdf-reader');
   }
+  function openInlinePdf(src,title){
+    closeInlineMedia();
+    inlineMediaTitle.textContent = title || 'Conteúdo 1';
+    inlinePdfFrame.src = src + '#toolbar=1&navpanes=1&view=FitH';
+    document.body.classList.add('inline-pdf-open');
+    document.querySelector('.scroll').scrollTop = 0;
+    if(window.matchMedia('(max-width:900px)').matches){
+      document.body.classList.add('sidebar-collapsed');
+    }
+  }
+  function openInlineVideo(src,title){
+    closeInlineMedia();
+    inlineMediaTitle.textContent = title || 'Conteúdo 1';
+    inlineVideoFrame.src = src;
+    document.body.classList.add('inline-video-open');
+    document.querySelector('.scroll').scrollTop = 0;
+    if(window.matchMedia('(max-width:900px)').matches){
+      document.body.classList.add('sidebar-collapsed');
+    }
+    inlineVideoFrame.play().catch(()=>{});
+  }
+  function closeInlineMedia(){
+    document.body.classList.remove('inline-pdf-open','inline-video-open');
+    inlinePdfFrame.src = 'about:blank';
+    inlineVideoFrame.pause();
+    inlineVideoFrame.removeAttribute('src');
+    inlineVideoFrame.load();
+  }
   function openVideoReader(src){
+    closeInlineMedia();
     resetReader();
     videoFrame.src = src;
     document.body.classList.add('reader-open','video-reader');
@@ -877,23 +942,43 @@
       document.body.classList.add('certificate-reader');
     }, 1400);
   }
+  // ── navegação anterior/próximo conteúdo ──
   const navItems = Array.from(document.querySelectorAll('.conteudo[data-open-pdf], .conteudo[data-open-video]'));
   let currentContentIndex = -1;
+  const inlineNavPrev = document.getElementById('inlineNavPrev');
+  const inlineNavNext = document.getElementById('inlineNavNext');
+  function updateNavButtons(){
+    inlineNavPrev.disabled = currentContentIndex <= 0;
+    inlineNavNext.disabled = currentContentIndex < 0 || currentContentIndex >= navItems.length - 1;
+  }
   function openContentByIndex(i){
     const item = navItems[i];
     if(!item) return;
     currentContentIndex = i;
-    if(item.dataset.openPdf) openPdfReader(item.dataset.openPdf);
-    else if(item.dataset.openVideo) openVideoReader(item.dataset.openVideo);
+    const title = item.querySelector('.cc-name')?.textContent.trim();
+    if(item.dataset.openPdf) openInlinePdf(item.dataset.openPdf, title);
+    else if(item.dataset.openVideo) openInlineVideo(item.dataset.openVideo, title);
+    updateNavButtons();
   }
+  inlineNavPrev.addEventListener('click',()=>openContentByIndex(currentContentIndex-1));
+  inlineNavNext.addEventListener('click',()=>openContentByIndex(currentContentIndex+1));
 
   document.querySelectorAll('[data-open-pdf], [data-open-video]').forEach(item=>{
-    function trigger(){
-      const idx = navItems.indexOf(item);
-      if(idx !== -1) openContentByIndex(idx);
-      else if(item.dataset.openPdf) openPdfReader(item.dataset.openPdf);
-      else if(item.dataset.openVideo) openVideoReader(item.dataset.openVideo);
-    }
+    item.addEventListener('click',()=>openContentByIndex(navItems.indexOf(item)));
+    item.addEventListener('keydown',e=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        openContentByIndex(navItems.indexOf(item));
+      }
+    });
+  });
+  readerBack.addEventListener('click', closePdfReader);
+  sideFinish.addEventListener('click', openCertificateFlow);
+  certificateClose.addEventListener('click', closeCertificateModal);
+
+  // ── avaliações: abrem em nova guia ──
+  document.querySelectorAll('[data-open-avaliacao]').forEach(item=>{
+    function trigger(){ window.open(item.dataset.openAvaliacao, '_blank'); }
     item.addEventListener('click', trigger);
     item.addEventListener('keydown',e=>{
       if(e.key === 'Enter' || e.key === ' '){
@@ -902,9 +987,6 @@
       }
     });
   });
-  readerBack.addEventListener('click', closePdfReader);
-  sideFinish.addEventListener('click', openCertificateFlow);
-  certificateClose.addEventListener('click', closeCertificateModal);
 
   // ── accordion (etapas) ──
   document.querySelectorAll('.etapa .etapa-h').forEach(h=>{

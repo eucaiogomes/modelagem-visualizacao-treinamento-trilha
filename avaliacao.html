@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script>
+(function(){
+  var MOBILE_W = 420;
+  if (window.top === window.self && window.innerWidth > MOBILE_W && new URLSearchParams(location.search).get('mv') !== '1') {
+    document.write('<style id="mv-hide">html{visibility:hidden!important;}</style>');
+  }
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avaliação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/lector-icons/css/lector-icons.css">
+<style>
+  :root{
+    --orange:#E87722; --orange-dark:#C4611A;
+    --n0:#fff; --n300:#E0E0E0;
+    --ink:#1A1A1A; --muted:#666;
+    --sans:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--n0);display:flex;flex-direction:column;}
+
+  .reader-top{height:50px;flex:none;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;padding:0 0 0 14px;}
+  .reader-back{height:34px;border:0;border-radius:18px;background:#ff8033;color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;padding:0 17px 0 13px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 5px rgba(232,119,34,.24);}
+  .reader-back:hover{background:var(--orange-dark);}
+  .reader-back .ui-icon{font-size:17px;}
+
+  .avaliacao-stage{flex:1;display:flex;align-items:center;justify-content:center;}
+  .avaliacao-card{text-align:center;}
+  .avaliacao-hint{margin:0 0 18px;font-size:14px;color:var(--muted);}
+  .avaliacao-start{height:44px;border:0;border-radius:22px;background:var(--orange);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;padding:0 26px;cursor:pointer;box-shadow:0 2px 6px rgba(232,119,34,.32);transition:.12s;}
+  .avaliacao-start:hover{background:var(--orange-dark);}
+</style>
+</head>
+<body>
+  <div class="reader-top">
+    <button class="reader-back" type="button" id="voltarTrilha" aria-label="Voltar para a trilha">
+      <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
+      <span>Voltar para a trilha</span>
+    </button>
+  </div>
+
+  <section class="avaliacao-stage" aria-label="Avaliação">
+    <div class="avaliacao-card">
+      <p class="avaliacao-hint">Clique no botão abaixo para começar sua avaliação</p>
+      <button class="avaliacao-start" type="button">Iniciar avaliação</button>
+    </div>
+  </section>
+
+<script>
+  document.getElementById('voltarTrilha').addEventListener('click', ()=>{
+    var target = new URL('trilha.html', window.top.location.href).href;
+    window.top.close();
+    setTimeout(()=>{ window.top.location.href = target; }, 300);
+  });
+</script>
+<script>
+(function(){
+  var MOBILE_W = 420;
+  if (window.top !== window.self) return;
+  if (new URLSearchParams(location.search).get('mv') === '1') return;
+  if (window.innerWidth <= MOBILE_W) return;
+  var url = new URL(location.href);
+  url.searchParams.set('mv','1');
+  document.body.removeAttribute('class');
+  document.body.innerHTML = '';
+  document.body.style.cssText = 'margin:0;min-height:100vh;display:flex;flex-direction:row;justify-content:center;background:#e5e5e5;';
+  var frame = document.createElement('iframe');
+  frame.src = url.toString();
+  frame.title = document.title;
+  frame.style.cssText = 'border:0;width:'+MOBILE_W+'px;max-width:100vw;height:100vh;background:#fff;';
+  document.body.appendChild(frame);
+  var hideStyle = document.getElementById('mv-hide');
+  if (hideStyle) hideStyle.remove();
+  document.documentElement.style.visibility = '';
+})();
+</script>
+</body>
+</html>
