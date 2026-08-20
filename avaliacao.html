@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<script>
-(function(){
-  var MOBILE_W = 420;
-  if (window.top === window.self && window.innerWidth > MOBILE_W && new URLSearchParams(location.search).get('mv') !== '1') {
-    document.write('<style id="mv-hide">html{visibility:hidden!important;}</style>');
-  }
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Avaliação</title>
@@ -18,68 +10,756 @@
 <link rel="stylesheet" href="assets/lector-icons/css/lector-icons.css">
 <style>
   :root{
-    --orange:#E87722; --orange-dark:#C4611A;
-    --n0:#fff; --n300:#E0E0E0;
-    --ink:#1A1A1A; --muted:#666;
+    --orange:#E87722; --orange-dark:#C4611A; --orange-light:#ff8033; --orange-subtle:#FDF0E6;
+    --navy:#1C4B82; --navy-light:#E4EBF5;
+    --green:#3D8A52; --green-light:#EAF6EE;
+    --warn:#B45309; --warn-light:#FEF8EC;
+    --n0:#fff; --n50:#F9FAFB; --n100:#F5F5F5; --n200:#EBEBEB; --n300:#E0E0E0; --n400:#CCC;
+    --ink:#1A1A1A; --muted:#666; --sub:#999;
     --sans:'Source Sans 3','Segoe UI',system-ui,sans-serif;
   }
   *{box-sizing:border-box;}
+  [hidden]{display:none!important;}
   html,body{height:100%;}
-  body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--n0);display:flex;flex-direction:column;}
+  body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--n50);display:flex;flex-direction:column;}
+  button{font-family:inherit;}
 
   .reader-top{height:50px;flex:none;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;padding:0 0 0 14px;}
-  .reader-back{height:34px;border:0;border-radius:18px;background:#ff8033;color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;padding:0 17px 0 13px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 5px rgba(232,119,34,.24);}
+  .reader-back{height:34px;border:0;border-radius:18px;background:var(--orange-light);color:#fff;font-size:13px;font-weight:700;padding:0 17px 0 13px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 5px rgba(232,119,34,.24);}
   .reader-back:hover{background:var(--orange-dark);}
   .reader-back .ui-icon{font-size:17px;}
+  .ui-icon{display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none;}
+  .ui-icon:before{width:auto;margin:0;}
 
-  .avaliacao-stage{flex:1;display:flex;align-items:center;justify-content:center;}
-  .avaliacao-card{text-align:center;}
+  /* ── tela inicial ── */
+  .avaliacao-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .avaliacao-card{text-align:center;max-width:420px;}
   .avaliacao-hint{margin:0 0 18px;font-size:14px;color:var(--muted);}
-  .avaliacao-start{height:44px;border:0;border-radius:22px;background:var(--orange);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;padding:0 26px;cursor:pointer;box-shadow:0 2px 6px rgba(232,119,34,.32);transition:.12s;}
+  .avaliacao-start{height:44px;border:0;border-radius:22px;background:var(--orange);color:#fff;font-size:14px;font-weight:700;padding:0 26px;cursor:pointer;box-shadow:0 2px 6px rgba(232,119,34,.32);transition:.12s;}
   .avaliacao-start:hover{background:var(--orange-dark);}
+
+  /* ── shell do questionário ── */
+  .quiz{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;}
+  .quiz-top{position:sticky;top:0;z-index:30;flex:none;height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;background:rgba(249,250,251,.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.05);}
+  .quiz-menu{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:0;border-radius:50%;background:transparent;color:var(--navy);font-size:18px;cursor:pointer;transition:.12s;}
+  .quiz-menu:hover{background:rgba(0,0,0,.05);}
+  .quiz-timer{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:16px;background:var(--navy-light);color:var(--navy);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .quiz-timer .ui-icon{font-size:13px;color:var(--orange);}
+
+  /* ── trilho de etapa (compacto) ── */
+  .stage-rail{position:sticky;top:56px;z-index:20;width:100%;display:block;text-align:left;padding:12px 16px;border:0;border-bottom:1px solid rgba(0,0,0,.05);background:rgba(249,250,251,.92);backdrop-filter:blur(12px);cursor:pointer;transition:background .12s;}
+  .stage-rail:hover{background:rgba(0,0,0,.02);}
+  .rail-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+  .rail-eyebrow{margin:0;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .rail-dim{margin:2px 0 0;font-size:14px;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rail-chip{flex:none;display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 10px;border-radius:999px;background:var(--orange-subtle);color:var(--orange);font-size:12px;font-weight:700;}
+  .rail-chip .ui-icon{font-size:9px;}
+  .rail-bars{display:flex;gap:3px;margin-top:10px;}
+  .rail-bars span{position:relative;height:6px;border-radius:999px;background:var(--n200);overflow:hidden;}
+  .rail-bars span i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--orange);transition:width .5s ease;}
+
+  /* ── grid principal ── */
+  .quiz-grid{width:100%;max-width:1440px;margin:0 auto;padding:18px 16px 40px;display:grid;grid-template-columns:1fr;gap:32px;}
+  .quiz-main{display:flex;flex-direction:column;min-width:0;}
+  .q-head{display:flex;align-items:baseline;gap:12px;}
+  .q-num{font-size:44px;font-weight:700;line-height:1;color:var(--orange);}
+  .q-text{margin:0;font-size:20px;font-weight:600;line-height:1.35;color:var(--navy);}
+  .q-options{margin-top:22px;border-top:1px solid var(--n300);display:flex;flex-direction:column;}
+  .q-opt{display:flex;align-items:center;gap:14px;width:100%;min-height:52px;padding:10px 12px;border:0;border-bottom:1px solid var(--n300);background:transparent;text-align:left;cursor:pointer;transition:background .3s ease,box-shadow .3s ease,border-color .3s ease;}
+  .q-opt:hover{background:rgba(28,75,130,.04);}
+  .q-opt .dot{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--n400);background:#fff;display:flex;align-items:center;justify-content:center;transition:border-color .3s ease;}
+  .q-opt:hover .dot{border-color:rgba(28,75,130,.45);}
+  .q-opt .dot i{width:11px;height:11px;border-radius:50%;background:var(--navy);transform:scale(0);transition:transform .25s ease;}
+  .q-opt .txt{font-size:15px;color:#333;transition:color .3s ease;}
+  .q-opt.sel{background:var(--navy-light);border-bottom-color:rgba(28,75,130,.22);box-shadow:inset 0 4px 10px -4px rgba(0,0,0,.05);}
+  .q-opt.sel .dot{border-color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.08);}
+  .q-opt.sel .dot i{transform:scale(1);}
+  .q-opt.sel .txt{color:var(--navy);font-weight:600;}
+
+  /* Todos os tipos de questão compartilham o mesmo ritmo de linha: mesma altura,
+     mesma borda inferior e o mesmo azul de seleção. O que muda é só o controle. */
+  .q-kind{display:block;margin:0 0 10px;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);}
+
+  /* múltipla escolha — caixa quadrada */
+  .q-opt .box{flex:none;width:22px;height:22px;border-radius:6px;border:1px solid var(--n400);background:#fff;display:flex;align-items:center;justify-content:center;transition:border-color .3s ease,background .3s ease;}
+  .q-opt:hover .box{border-color:rgba(28,75,130,.45);}
+  .q-opt .box i{width:11px;height:11px;border-radius:2px;background:var(--navy);transform:scale(0);transition:transform .25s ease;}
+  .q-opt.sel .box{border-color:var(--navy);}
+  .q-opt.sel .box i{transform:scale(1);}
+
+  /* verdadeiro ou falso */
+  .vf{margin-top:22px;border-top:1px solid var(--n300);}
+  .vf-head{display:grid;grid-template-columns:1fr 52px 52px;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--n300);}
+  .vf-head span{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;}
+  .vf-head span:first-child{text-align:left;}
+  .vf-row{display:grid;grid-template-columns:1fr 52px 52px;align-items:center;gap:8px;min-height:52px;padding:10px 12px;border-bottom:1px solid var(--n300);}
+  .vf-row .stm{font-size:15px;color:#333;}
+  .vf-btn{justify-self:center;width:26px;height:26px;padding:0;border:1px solid var(--n400);border-radius:50%;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;}
+  .vf-btn:hover{border-color:rgba(28,75,130,.45);}
+  .vf-btn i{width:12px;height:12px;border-radius:50%;background:var(--navy);transform:scale(0);transition:transform .2s ease;}
+  .vf-btn.on{border-color:var(--navy);}
+  .vf-btn.on i{transform:scale(1);}
+
+  /* associativa */
+  .assoc{margin-top:22px;border-top:1px solid var(--n300);}
+  .assoc-head{display:grid;grid-template-columns:1fr 150px;gap:14px;padding:8px 12px;border-bottom:1px solid var(--n300);}
+  .assoc-head span{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .assoc-row{display:grid;grid-template-columns:1fr 150px;align-items:center;gap:14px;min-height:56px;padding:10px 12px;border-bottom:1px solid var(--n300);}
+  .assoc-row .stm{font-size:15px;color:#333;}
+  .sel-wrap{position:relative;}
+  .sel-wrap:after{content:"";position:absolute;right:13px;top:50%;width:7px;height:7px;margin-top:-5px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);pointer-events:none;}
+  .assoc-row select{appearance:none;-webkit-appearance:none;width:100%;height:40px;padding:0 32px 0 12px;border:1px solid var(--n400);border-radius:8px;background:#fff;font-family:inherit;font-size:14px;color:#333;cursor:pointer;transition:border-color .2s;}
+  .assoc-row select:hover{border-color:rgba(28,75,130,.45);}
+  .assoc-row select:focus-visible{outline:2px solid var(--navy);outline-offset:1px;}
+  .assoc-row.done select{border-color:var(--navy);background:var(--navy-light);color:var(--navy);font-weight:600;}
+
+  /* completar lacuna */
+  .lacuna{margin-top:26px;font-size:17px;line-height:2.2;color:#333;}
+  .lacuna input{width:190px;height:38px;padding:0 12px;margin:0 4px;border:0;border-bottom:2px solid var(--n400);background:var(--n100);border-radius:6px 6px 0 0;font-family:inherit;font-size:16px;color:var(--navy);font-weight:600;transition:border-color .2s,background .2s;}
+  .lacuna input::placeholder{color:var(--sub);font-weight:400;}
+  .lacuna input:focus{outline:none;border-bottom-color:var(--orange);background:#fff;}
+  .lacuna input.done{border-bottom-color:var(--navy);background:var(--navy-light);}
+
+  .q-foot{margin-top:16px;display:flex;flex-direction:column;gap:26px;}
+  .q-hint{margin:0;min-height:20px;font-size:14px;color:var(--muted);}
+  .q-nav{display:flex;align-items:center;justify-content:space-between;}
+  .q-nav-btn{width:48px;height:48px;border:0;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:17px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.14);transition:.12s;}
+  .q-nav-btn.prev{background:var(--orange-light);}
+  .q-nav-btn.next{background:var(--orange);}
+  .q-nav-btn:hover:not(:disabled){background:var(--orange-dark);}
+  .q-nav-btn:disabled{opacity:.3;cursor:not-allowed;box-shadow:none;}
+  .q-nav-btn.ghost{visibility:hidden;}
+
+  /* ── painel lateral ── */
+  .quiz-aside{display:none;}
+  .aside-card{position:sticky;top:80px;border:1px solid rgba(0,0,0,.05);border-radius:16px;background:#fff;padding:20px;box-shadow:0 20px 40px -15px rgba(0,0,0,.06);}
+  .panel-prog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .panel-prog-head b{font-size:13px;font-weight:700;color:var(--navy);}
+  .panel-prog-head span{font-size:13px;font-weight:500;color:var(--muted);}
+  .panel-bar{height:5px;border-radius:999px;background:var(--n200);overflow:hidden;}
+  .panel-bar i{display:block;height:100%;border-radius:999px;background:var(--orange);transition:width .5s ease;}
+  .panel-q-head{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px;}
+  .panel-q-head h3{margin:0;font-size:15px;font-weight:600;color:var(--navy);}
+  .panel-q-head span{font-size:13px;color:var(--muted);}
+  .panel-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  .panel-sq{position:relative;aspect-ratio:1;border-radius:7px;border:1px solid var(--n300);background:#fff;color:var(--muted);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.12s;}
+  .panel-sq:hover{border-color:var(--sub);}
+  .panel-sq.done{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .panel-sq.done:after{content:"";position:absolute;top:4px;right:4px;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.7);}
+  .panel-sq.cur{border:2px solid var(--orange);background:var(--orange-subtle);color:var(--orange);}
+  .panel-sq.cur .ui-icon{font-size:12px;}
+  .panel-legend{margin-top:26px;display:flex;flex-direction:column;gap:13px;font-size:13px;color:var(--muted);}
+  .panel-legend div{display:flex;align-items:center;gap:11px;}
+  .legend-box{flex:none;width:23px;height:23px;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+  .legend-box.cur{border:2px solid var(--orange);background:var(--orange-subtle);color:var(--orange);font-size:11px;}
+  .legend-box.done{background:var(--navy);}
+  .legend-box.todo{border:1px solid var(--n300);background:#fff;}
+
+  /* ── setas fixas (desktop) ── */
+  .fab{display:none;position:fixed;top:50%;transform:translateY(-50%);z-index:50;width:60px;height:60px;border:0;border-radius:50%;color:#fff;font-size:22px;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 16px 30px -8px rgba(0,0,0,.32);transition:transform .15s,background .15s,opacity .15s;}
+  .fab.prev{left:24px;background:var(--orange-light);}
+  .fab.next{right:24px;background:var(--orange);}
+  .fab:hover:not(:disabled){background:var(--orange-dark);transform:translateY(-50%) scale(1.08);}
+  .fab:active:not(:disabled){transform:translateY(-50%) scale(.95);}
+  .fab:disabled{opacity:.3;cursor:not-allowed;box-shadow:none;}
+  /* Embutida como conteúdo do treinamento: quem navega são as setas do próprio
+     treinamento, então a avaliação não desenha um segundo par de botões. */
+  body.nav-externa .fab,body.nav-externa .q-nav{display:none!important;}
+
+  /* ── gaveta (compacto) ── */
+  .sheet-backdrop{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s;}
+  body.sheet-open .sheet-backdrop{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;top:0;right:0;bottom:0;z-index:61;width:min(320px,86vw);background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.16);transform:translateX(100%);transition:transform .24s ease;display:flex;flex-direction:column;}
+  body.sheet-open .sheet{transform:none;}
+  .sheet-head{flex:none;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 18px;border-bottom:1px solid var(--n300);}
+  .sheet-head h3{margin:0;font-size:15px;font-weight:600;color:var(--navy);}
+  .sheet-close{width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:15px;cursor:pointer;}
+  .sheet-close:hover{background:var(--n100);}
+  .sheet-body{flex:1;overflow-y:auto;padding:18px;}
+
+  /* ── resultado ── */
+  .result{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .result-card{width:100%;max-width:420px;text-align:center;border:1px solid rgba(0,0,0,.05);border-radius:16px;background:#fff;padding:30px 26px;box-shadow:0 20px 40px -15px rgba(0,0,0,.08);}
+  .result-ico{width:60px;height:60px;margin:0 auto 16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;}
+  .result-ico.ok{background:var(--green-light);color:var(--green);}
+  .result-ico.no{background:var(--warn-light);color:var(--warn);}
+  .result-card h2{margin:0 0 6px;font-size:21px;font-weight:700;color:var(--navy);}
+  .result-sub{margin:0 0 20px;font-size:14px;color:var(--muted);}
+  .result-score{font-size:44px;font-weight:700;line-height:1;color:var(--orange);}
+  .result-score small{display:block;margin-top:6px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);}
+  .result-actions{margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .btn-outline{height:40px;padding:0 20px;border:1px solid var(--n300);border-radius:20px;background:#fff;color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;transition:.12s;}
+  .btn-outline:hover{background:var(--n100);}
+
+  @media (min-width:900px){
+    .quiz-top{height:64px;padding:0 32px;}
+    .quiz-menu{display:none;}
+    .stage-rail{display:none;}
+    .quiz-grid{grid-template-columns:minmax(0,1fr) 340px;gap:48px;padding:28px 32px 48px 32px;}
+    .quiz-aside{display:block;}
+    .q-num{font-size:58px;}
+    .q-text{font-size:27px;line-height:1.3;}
+    .q-options{margin-top:34px;}
+    .q-opt{min-height:56px;gap:18px;}
+    .q-opt .dot{width:24px;height:24px;}
+    .q-opt .dot i{width:12px;height:12px;}
+    .q-opt .txt{font-size:16px;}
+    .vf-row .stm,.assoc-row .stm{font-size:16px;}
+  }
+  /* Só usa as setas fixas quando há largura para elas sem cobrir o conteúdo;
+     abaixo disso, mantém os botões inline embaixo das alternativas. */
+  @media (min-width:1181px){
+    .quiz-grid{padding-left:104px;padding-right:104px;}
+    .q-nav{display:none;}
+    .fab{display:flex;}
+  }
 </style>
 </head>
 <body>
-  <div class="reader-top">
-    <button class="reader-back" type="button" id="voltarTrilha" aria-label="Voltar para a trilha">
-      <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
-      <span>Voltar para a trilha</span>
-    </button>
-  </div>
 
-  <section class="avaliacao-stage" aria-label="Avaliação">
+
+  <!-- ───────── TELA INICIAL ───────── -->
+  <section class="avaliacao-stage" id="startStage" aria-label="Avaliação">
     <div class="avaliacao-card">
       <p class="avaliacao-hint">Clique no botão abaixo para começar sua avaliação</p>
-      <button class="avaliacao-start" type="button">Iniciar avaliação</button>
+      <button class="avaliacao-start" type="button" id="startBtn">Iniciar avaliação</button>
     </div>
   </section>
 
-<script>
-  document.getElementById('voltarTrilha').addEventListener('click', ()=>{
-    var target = new URL('trilha.html', window.top.location.href).href;
-    window.top.close();
-    setTimeout(()=>{ window.top.location.href = target; }, 300);
-  });
-</script>
+  <!-- ───────── QUESTIONÁRIO ───────── -->
+  <div class="quiz" id="quiz" hidden>
+    <header class="quiz-top">
+      <button class="quiz-menu" type="button" id="openSheet" aria-label="Abrir etapas do questionário">
+        <i class="ui-icon icon-menu-burger" aria-hidden="true"></i>
+      </button>
+      <div class="quiz-timer"><i class="ui-icon icon-clock" aria-hidden="true"></i><span id="timer">00:00</span></div>
+    </header>
+
+    <button class="stage-rail" type="button" id="stageRail">
+      <div class="rail-head">
+        <div style="min-width:0">
+          <p class="rail-eyebrow" id="railEtapa">Etapa 1 de 4</p>
+          <p class="rail-dim" id="railDim">—</p>
+        </div>
+        <span class="rail-chip"><span id="railCount">1/5</span><i class="ui-icon icon-right-open" aria-hidden="true"></i></span>
+      </div>
+      <div class="rail-bars" id="railBars"></div>
+    </button>
+
+    <div class="quiz-grid">
+      <main class="quiz-main">
+        <div class="q-head">
+          <span class="q-num" id="qNum">1.</span>
+          <h1 class="q-text" id="qText">—</h1>
+        </div>
+        <div class="q-options" id="qOptions"></div>
+        <div class="q-foot">
+          <p class="q-hint" id="qHint">Selecione uma alternativa para continuar</p>
+          <div class="q-nav">
+            <button class="q-nav-btn prev" type="button" id="navPrev" aria-label="Questão anterior">
+              <i class="ui-icon icon-left-open" aria-hidden="true"></i>
+            </button>
+            <button class="q-nav-btn next" type="button" id="navNext" aria-label="Próxima questão">
+              <i class="ui-icon icon-right-open" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="quiz-aside">
+        <div class="aside-card" id="panelDesktop"></div>
+      </aside>
+    </div>
+
+    <button class="fab prev" type="button" id="fabPrev" aria-label="Questão anterior">
+      <i class="ui-icon icon-left-open" aria-hidden="true"></i>
+    </button>
+    <button class="fab next" type="button" id="fabNext" aria-label="Próxima questão">
+      <i class="ui-icon icon-right-open" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- ───────── RESULTADO ───────── -->
+  <section class="result" id="resultStage" hidden>
+    <div class="result-card">
+      <div class="result-ico" id="resultIco"><i class="ui-icon icon-award" aria-hidden="true"></i></div>
+      <h2 id="resultTitle">Avaliação concluída</h2>
+      <p class="result-sub" id="resultSub">Confira o seu aproveitamento abaixo.</p>
+      <div class="result-score"><span id="resultPct">0%</span><small>Aproveitamento</small></div>
+      <div class="result-actions">
+        <button class="btn-outline" type="button" id="redoBtn">Responder novamente</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── GAVETA (compacto) ───────── -->
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <aside class="sheet" id="sheet" aria-label="Etapas do questionário">
+    <div class="sheet-head">
+      <h3>Etapas do questionário</h3>
+      <button class="sheet-close" type="button" id="closeSheet" aria-label="Fechar">
+        <i class="ui-icon icon-close" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="sheet-body" id="panelMobile"></div>
+  </aside>
+
+
+
 <script>
 (function(){
-  var MOBILE_W = 420;
-  if (window.top !== window.self) return;
-  if (new URLSearchParams(location.search).get('mv') === '1') return;
-  if (window.innerWidth <= MOBILE_W) return;
-  var url = new URL(location.href);
-  url.searchParams.set('mv','1');
-  document.body.removeAttribute('class');
-  document.body.innerHTML = '';
-  document.body.style.cssText = 'margin:0;min-height:100vh;display:flex;flex-direction:row;justify-content:center;background:#e5e5e5;';
-  var frame = document.createElement('iframe');
-  frame.src = url.toString();
-  frame.title = document.title;
-  frame.style.cssText = 'border:0;width:'+MOBILE_W+'px;max-width:100vw;height:100vh;background:#fff;';
-  document.body.appendChild(frame);
-  var hideStyle = document.getElementById('mv-hide');
-  if (hideStyle) hideStyle.remove();
-  document.documentElement.style.visibility = '';
+  'use strict';
+
+  // ── banco de questões — uma de cada tipo ──
+  const QUESTIONS = [
+    {
+      type:'unica',
+      dimension:'Atendimento',
+      text:'Ao receber um novo chamado no Suporte Lector, qual é o primeiro passo?',
+      options:[
+        'Encaminhar direto para o time de desenvolvimento',
+        'Registrar o chamado e confirmar o entendimento com o cliente',
+        'Aguardar o cliente enviar mais informações por conta própria',
+        'Encerrar o chamado se o problema parecer simples'
+      ],
+      correct:1
+    },
+    {
+      type:'multipla',
+      dimension:'Registro',
+      text:'O que deve constar no registro de um chamado?',
+      options:[
+        'Descrição do problema relatado',
+        'Passos para reproduzir a ocorrência',
+        'Evidências como print ou vídeo',
+        'A opinião do atendente sobre o cliente'
+      ],
+      correct:[0,1,2]
+    },
+    {
+      type:'vf',
+      dimension:'Escalonamento',
+      text:'Classifique cada afirmação sobre escalonamento de chamados.',
+      rows:[
+        {text:'Chamados que excedem o prazo do primeiro nível devem ser escalonados.', correct:true},
+        {text:'O escalonamento dispensa o registro do que já foi tentado.', correct:false},
+        {text:'O cliente deve ser avisado quando o chamado muda de nível.', correct:true},
+        {text:'Só se escalona um chamado no fim do expediente.', correct:false}
+      ]
+    },
+    {
+      type:'associativa',
+      dimension:'Prioridade',
+      text:'Relacione cada situação ao nível de prioridade correspondente.',
+      choices:['Crítica','Alta','Média','Baixa'],
+      rows:[
+        {text:'Sistema fora do ar para todos os usuários', correct:'Crítica'},
+        {text:'Falha em um módulo usado por uma equipe', correct:'Alta'},
+        {text:'Erro visual que não impede o uso', correct:'Média'},
+        {text:'Sugestão de melhoria para uma tela', correct:'Baixa'}
+      ]
+    },
+    {
+      type:'lacuna',
+      dimension:'Comunicação',
+      text:'Complete a frase sobre comunicação de prazos.',
+      before:'Quando o prazo previsto não puder ser cumprido, o atendente informa o cliente de forma',
+      after:', com novo prazo e justificativa.',
+      placeholder:'digite aqui',
+      accepts:['proativa','proativo','pro-ativa','pró-ativa','proatica']
+    }
+  ];
+
+  const TOTAL = QUESTIONS.length;
+
+  // agrupa questões consecutivas da mesma dimensão (etapas)
+  const GROUPS = QUESTIONS.reduce(function(acc, q, i){
+    const last = acc[acc.length - 1];
+    if(last && last.dimension === q.dimension) last.length += 1;
+    else acc.push({dimension:q.dimension, start:i, length:1});
+    return acc;
+  }, []);
+
+  const answers = {};   // { indice: opcaoEscolhida }
+  let current = 0;
+  let timerId = null, elapsed = 0;
+
+  const $ = function(id){ return document.getElementById(id); };
+  const startStage = $('startStage'), quiz = $('quiz'), resultStage = $('resultStage');
+  const qNum = $('qNum'), qText = $('qText'), qKind = $('qKind'), qOptions = $('qOptions'), qHint = $('qHint');
+  const navPrev = $('navPrev'), navNext = $('navNext');
+  const fabPrev = $('fabPrev'), fabNext = $('fabNext');
+  const railEtapa = $('railEtapa'), railDim = $('railDim'), railCount = $('railCount'), railBars = $('railBars');
+  const panelDesktop = $('panelDesktop'), panelMobile = $('panelMobile');
+
+  function answeredCount(){ return Object.keys(answers).length; }
+  function progressPct(){ return Math.round(answeredCount() / TOTAL * 100); }
+  const esc = function(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+
+  // Cada tipo tem a sua própria ideia do que é "respondida": a múltipla precisa de
+  // ao menos uma marcação, V/F e associativa precisam de todas as linhas.
+  function isAnswered(i){
+    const q = QUESTIONS[i], a = answers[i];
+    if(a === undefined) return false;
+    switch(q.type){
+      case 'multipla':    return Array.isArray(a) && a.length > 0;
+      case 'vf':          return Array.isArray(a) && a.length === q.rows.length && a.every(function(v){ return v === true || v === false; });
+      case 'associativa': return Array.isArray(a) && a.length === q.rows.length && a.every(function(v){ return !!v; });
+      case 'lacuna':      return typeof a === 'string' && a.trim() !== '';
+      default:            return a !== undefined && a !== null;
+    }
+  }
+
+  function isCorrect(i){
+    const q = QUESTIONS[i], a = answers[i];
+    if(!isAnswered(i)) return false;
+    switch(q.type){
+      case 'multipla': {
+        const esperado = q.correct.slice().sort().join(',');
+        return a.slice().sort().join(',') === esperado;
+      }
+      case 'vf':          return q.rows.every(function(r, k){ return a[k] === r.correct; });
+      case 'associativa': return q.rows.every(function(r, k){ return a[k] === r.correct; });
+      case 'lacuna': {
+        const norm = a.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        return q.accepts.some(function(ok){
+          return ok.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') === norm;
+        });
+      }
+      default: return a === q.correct;
+    }
+  }
+
+  const KIND_LABEL = {
+    unica:'Escolha única', multipla:'Múltipla escolha', vf:'Verdadeiro ou falso',
+    associativa:'Questão associativa', lacuna:'Completar lacuna'
+  };
+  const KIND_HINT = {
+    unica:'Selecione uma alternativa para continuar',
+    multipla:'Selecione todas as alternativas corretas',
+    vf:'Marque V ou F em cada afirmação',
+    associativa:'Escolha a prioridade de cada situação',
+    lacuna:'Preencha a lacuna para continuar'
+  };
+
+  // ── cronômetro ──
+  function fmt(s){
+    const m = Math.floor(s / 60), r = s % 60;
+    return String(m).padStart(2,'0') + ':' + String(r).padStart(2,'0');
+  }
+  function startTimer(){
+    stopTimer();
+    timerId = setInterval(function(){ elapsed += 1; $('timer').textContent = fmt(elapsed); }, 1000);
+  }
+  function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+
+  // ── painel de questões (usado no desktop e na gaveta) ──
+  function panelHTML(){
+    let sq = '';
+    for(let i = 0; i < TOTAL; i++){
+      const cls = i === current ? 'cur' : (isAnswered(i) ? 'done' : '');
+      const inner = i === current ? '<i class="ui-icon icon-checked" aria-hidden="true"></i>' : (i + 1);
+      sq += '<button class="panel-sq ' + cls + '" type="button" data-goto="' + i + '"' +
+            ' aria-label="Questão ' + (i + 1) + (isAnswered(i) ? ' — respondida' : '') + '">' + inner + '</button>';
+    }
+    return '' +
+      '<div class="panel-prog-head"><span>Progresso</span><b>' + progressPct() + '%</b></div>' +
+      '<div class="panel-bar"><i style="width:' + progressPct() + '%"></i></div>' +
+      '<div class="panel-q-head"><h3>Questões</h3><span>' + answeredCount() + '/' + TOTAL + '</span></div>' +
+      '<div class="panel-grid">' + sq + '</div>' +
+      '<div class="panel-legend">' +
+        '<div><span class="legend-box cur"><i class="ui-icon icon-checked" aria-hidden="true"></i></span>Questão atual</div>' +
+        '<div><span class="legend-box done"></span>Respondida</div>' +
+        '<div><span class="legend-box todo"></span>Não respondida</div>' +
+      '</div>';
+  }
+
+  function renderPanels(){
+    const html = panelHTML();
+    panelDesktop.innerHTML = html;
+    panelMobile.innerHTML = html;
+  }
+
+  // ── trilho de etapas ──
+  function renderRail(){
+    const gi = GROUPS.findIndex(function(g){ return current >= g.start && current < g.start + g.length; });
+    const g = GROUPS[gi];
+    railEtapa.textContent = 'Etapa ' + (gi + 1) + ' de ' + GROUPS.length;
+    railDim.textContent = g.dimension;
+    railCount.textContent = (current + 1) + '/' + TOTAL;
+    railBars.innerHTML = GROUPS.map(function(grp, i){
+      let fill;
+      if(i < gi) fill = 1;
+      else if(i > gi) fill = 0;
+      else {
+        let done = 0;
+        for(let k = 0; k < grp.length; k++) if(isAnswered(grp.start + k)) done++;
+        fill = done / grp.length;
+      }
+      return '<span style="flex-grow:' + grp.length + '"><i style="width:' + (fill * 100) + '%"></i></span>';
+    }).join('');
+  }
+
+  // ── questão atual ──
+  // ── renderização por tipo ──
+  function renderTipo(q, a){
+    if(q.type === 'unica' || q.type === 'multipla'){
+      const marcados = q.type === 'multipla' ? (a || []) : null;
+      return q.options.map(function(label, i){
+        const on = q.type === 'multipla' ? marcados.indexOf(i) !== -1 : a === i;
+        const ctrl = q.type === 'multipla' ? '<span class="box"><i></i></span>' : '<span class="dot"><i></i></span>';
+        return '<button class="q-opt' + (on ? ' sel' : '') + '" type="button" data-opt="' + i + '"' +
+               ' role="' + (q.type === 'multipla' ? 'checkbox' : 'radio') + '" aria-checked="' + on + '">' +
+                 ctrl + '<span class="txt">' + esc(label) + '</span>' +
+               '</button>';
+      }).join('');
+    }
+
+    if(q.type === 'vf'){
+      const val = a || [];
+      return '<div class="vf">' +
+        '<div class="vf-head"><span>Afirmação</span><span>V</span><span>F</span></div>' +
+        q.rows.map(function(r, k){
+          const btn = function(v, lbl){
+            return '<button class="vf-btn' + (val[k] === v ? ' on' : '') + '" type="button"' +
+                   ' data-vf="' + k + '" data-val="' + v + '" role="radio" aria-checked="' + (val[k] === v) + '"' +
+                   ' aria-label="' + lbl + ': ' + esc(r.text) + '"><i></i></button>';
+          };
+          return '<div class="vf-row"><span class="stm">' + esc(r.text) + '</span>' +
+                 btn(true,'Verdadeiro') + btn(false,'Falso') + '</div>';
+        }).join('') +
+      '</div>';
+    }
+
+    if(q.type === 'associativa'){
+      const val = a || [];
+      return '<div class="assoc">' +
+        '<div class="assoc-head"><span>Situação</span><span>Prioridade</span></div>' +
+        q.rows.map(function(r, k){
+          const opts = ['<option value="">Selecione</option>'].concat(q.choices.map(function(c){
+            return '<option value="' + esc(c) + '"' + (val[k] === c ? ' selected' : '') + '>' + esc(c) + '</option>';
+          })).join('');
+          return '<div class="assoc-row' + (val[k] ? ' done' : '') + '">' +
+                   '<span class="stm">' + esc(r.text) + '</span>' +
+                   '<span class="sel-wrap"><select data-assoc="' + k + '"' +
+                     ' aria-label="Prioridade para: ' + esc(r.text) + '">' + opts + '</select></span>' +
+                 '</div>';
+        }).join('') +
+      '</div>';
+    }
+
+    // lacuna
+    const txt = typeof a === 'string' ? a : '';
+    return '<p class="lacuna">' + esc(q.before) +
+             ' <input type="text" id="lacunaInput" value="' + esc(txt) + '"' +
+             ' class="' + (txt.trim() ? 'done' : '') + '"' +
+             ' placeholder="' + esc(q.placeholder) + '" autocomplete="off"' +
+             ' aria-label="Preencha a lacuna">' +
+           esc(q.after) + '</p>';
+  }
+
+  function renderQuestion(){
+    const q = QUESTIONS[current];
+    qNum.textContent = (current + 1) + '.';
+    if(qKind) qKind.textContent = KIND_LABEL[q.type];
+    qText.textContent = q.text;
+
+    qOptions.innerHTML = renderTipo(q, answers[current]);
+
+    const answered = isAnswered(current);
+    qHint.textContent = answered ? '' : KIND_HINT[q.type];
+
+    const atStart = current === 0;
+    navPrev.classList.toggle('ghost', atStart);
+    fabPrev.style.display = '';
+    if(atStart) fabPrev.style.visibility = 'hidden'; else fabPrev.style.visibility = '';
+    navNext.disabled = !answered;
+    fabNext.disabled = !answered;
+
+    const isLast = current === TOTAL - 1;
+    const lastLabel = isLast ? 'Finalizar avaliação' : 'Próxima questão';
+    navNext.setAttribute('aria-label', lastLabel);
+    fabNext.setAttribute('aria-label', lastLabel);
+
+    renderRail();
+    renderPanels();
+    notifyParent();
+  }
+
+  function goTo(i){
+    if(i < 0 || i >= TOTAL) return;
+    current = i;
+    renderQuestion();
+    quiz.scrollTop = 0;
+  }
+
+  function advance(){
+    if(!isAnswered(current)) return;
+    if(current === TOTAL - 1) finish();
+    else goTo(current + 1);
+  }
+
+  function finish(){
+    stopTimer();
+    let acertos = 0;
+    for(let i = 0; i < TOTAL; i++) if(isCorrect(i)) acertos++;
+    const pct = Math.round(acertos / TOTAL * 100);
+    const aprovado = pct >= 60;
+
+    $('resultPct').textContent = pct + '%';
+    $('resultIco').className = 'result-ico ' + (aprovado ? 'ok' : 'no');
+    $('resultTitle').textContent = aprovado ? 'Avaliação concluída' : 'Avaliação finalizada';
+    $('resultSub').textContent = acertos + ' de ' + TOTAL + ' questões corretas · tempo ' + fmt(elapsed) +
+      (aprovado ? ' · você foi aprovado.' : ' · aproveitamento abaixo do mínimo (60%).');
+
+    quiz.hidden = true;
+    resultStage.hidden = false;
+    document.body.classList.remove('sheet-open');
+    notifyParent();
+  }
+
+  // ── integração com o treinamento ──
+  // Quando a avaliação é aberta como conteúdo dentro do treinamento (index.html),
+  // as setas de anterior/próximo que já existem lá é que passam a navegar pelas
+  // questões — por isso escondemos as setas próprias e expomos esta API.
+  // Identificamos o contexto pelo iframe que hospeda esta página, e não por
+  // funções do pai — trilha.html e index.html expõem nomes iguais.
+  //   #inlineAvaliacaoFrame → conteúdo dentro do treinamento (usa as setas de lá)
+  //   #trainingFrame        → overlay da trilha (usa as setas próprias)
+  let hostFrameId = '';
+  try{ hostFrameId = (window !== window.top && window.frameElement && window.frameElement.id) || ''; }
+  catch(e){ hostFrameId = ''; }
+  const embutida = hostFrameId === 'inlineAvaliacaoFrame';
+  if(embutida) document.body.classList.add('nav-externa');
+
+  function notifyParent(){
+    if(!embutida) return;
+    try{ if(typeof window.parent.syncQuizNav === 'function') window.parent.syncQuizNav(); }catch(e){}
+  }
+
+  window.quizNav = {
+    isActive: function(){ return !quiz.hidden; },
+    canPrev:  function(){ return current > 0; },
+    canNext:  function(){ return isAnswered(current); },
+    prev:     function(){ if(current > 0) goTo(current - 1); },
+    next:     function(){ advance(); },
+    nextLabel:function(){
+      return current === TOTAL - 1 ? 'Concluir' : 'Questão ' + (current + 2) + ' de ' + TOTAL;
+    },
+    prevLabel:function(){ return current > 0 ? 'Questão ' + current + ' de ' + TOTAL : ''; }
+  };
+
+  // ── eventos ──
+  $('startBtn').addEventListener('click', function(){
+    startStage.hidden = true;
+    resultStage.hidden = true;
+    quiz.hidden = false;
+    elapsed = 0;
+    $('timer').textContent = '00:00';
+    startTimer();
+    renderQuestion();
+  });
+
+  qOptions.addEventListener('click', function(e){
+    const q = QUESTIONS[current];
+
+    const opt = e.target.closest('[data-opt]');
+    if(opt){
+      const i = Number(opt.dataset.opt);
+      if(q.type === 'multipla'){
+        const atual = answers[current] || [];
+        const pos = atual.indexOf(i);
+        answers[current] = pos === -1 ? atual.concat(i) : atual.filter(function(v){ return v !== i; });
+      } else {
+        answers[current] = i;
+      }
+      renderQuestion();
+      return;
+    }
+
+    const vf = e.target.closest('[data-vf]');
+    if(vf){
+      const k = Number(vf.dataset.vf);
+      const atual = (answers[current] || []).slice();
+      atual[k] = vf.dataset.val === 'true';
+      answers[current] = atual;
+      renderQuestion();
+    }
+  });
+
+  qOptions.addEventListener('change', function(e){
+    const sel = e.target.closest('[data-assoc]');
+    if(!sel) return;
+    const k = Number(sel.dataset.assoc);
+    const atual = (answers[current] || []).slice();
+    atual[k] = sel.value;
+    answers[current] = atual;
+    renderQuestion();
+  });
+
+  // A lacuna atualiza a cada tecla, mas re-renderizar tiraria o foco do campo —
+  // por isso guardamos o valor e só sincronizamos os controles ao redor.
+  qOptions.addEventListener('input', function(e){
+    if(e.target.id !== 'lacunaInput') return;
+    answers[current] = e.target.value;
+    e.target.classList.toggle('done', e.target.value.trim() !== '');
+    const ok = isAnswered(current);
+    qHint.textContent = ok ? '' : KIND_HINT[QUESTIONS[current].type];
+    navNext.disabled = !ok;
+    fabNext.disabled = !ok;
+    renderRail();
+    renderPanels();
+    notifyParent();
+  });
+
+  qOptions.addEventListener('keydown', function(e){
+    if(e.target.id === 'lacunaInput' && e.key === 'Enter'){ e.preventDefault(); advance(); }
+  });
+
+  navPrev.addEventListener('click', function(){ goTo(current - 1); });
+  fabPrev.addEventListener('click', function(){ goTo(current - 1); });
+  navNext.addEventListener('click', advance);
+  fabNext.addEventListener('click', advance);
+
+  function onPanelClick(e){
+    const btn = e.target.closest('[data-goto]');
+    if(!btn) return;
+    goTo(Number(btn.dataset.goto));
+    document.body.classList.remove('sheet-open');
+  }
+  panelDesktop.addEventListener('click', onPanelClick);
+  panelMobile.addEventListener('click', onPanelClick);
+
+  function openSheet(){ document.body.classList.add('sheet-open'); }
+  function closeSheet(){ document.body.classList.remove('sheet-open'); }
+  $('openSheet').addEventListener('click', openSheet);
+  $('stageRail').addEventListener('click', openSheet);
+  $('closeSheet').addEventListener('click', closeSheet);
+  $('sheetBackdrop').addEventListener('click', closeSheet);
+
+  $('redoBtn').addEventListener('click', function(){
+    for(const k in answers) delete answers[k];
+    current = 0;
+    elapsed = 0;
+    $('timer').textContent = '00:00';
+    resultStage.hidden = true;
+    quiz.hidden = false;
+    startTimer();
+    renderQuestion();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(quiz.hidden) return;
+    // Setas pertencem ao campo enquanto ele estiver em foco (digitar / abrir lista).
+    const tag = e.target.tagName;
+    if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA'){
+      if(e.key === 'Escape') closeSheet();
+      return;
+    }
+    if(e.key === 'ArrowRight') advance();
+    else if(e.key === 'ArrowLeft') goTo(current - 1);
+    else if(e.key === 'Escape') closeSheet();
+  });
 })();
 </script>
 </body>

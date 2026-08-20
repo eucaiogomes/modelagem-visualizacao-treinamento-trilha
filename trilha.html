@@ -1,17 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<script>
-(function(){
-  var MOBILE_W = 420;
-  if (window.top === window.self && window.innerWidth > MOBILE_W && new URLSearchParams(location.search).get('mv') !== '1') {
-    document.write('<style id="mv-hide">html{visibility:hidden!important;}</style>');
-  }
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trilha Completa Automação — Conteúdo 2</title>
+<title>Trilha Completa Automação — Conteúdo 1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -188,12 +180,62 @@
   body.inline-pdf-open .inline-media-reader,body.inline-video-open .inline-media-reader{display:flex;}
   .inline-pdf-head{height:44px;flex:none;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;padding:0 16px;}
   .inline-pdf-title{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* resource-viewer lateral nav (Lector Live style) */
+  .resource-viewer-wrap{display:none;align-items:stretch;}
+  body.inline-pdf-open .resource-viewer-wrap,body.inline-video-open .resource-viewer-wrap{display:flex;}
+  body.inline-pdf-open .inline-media-reader,body.inline-video-open .inline-media-reader{display:flex;flex:1;min-width:0;}
+  .left-arrow-resource-area,.right-arrow-resource-area{flex:none;width:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;z-index:20;}
+  /* The expandable button — starts invisible at 60×60, expands to 375×110 on hover */
+  .resource-arrow-btn{
+    cursor:pointer;position:absolute;overflow:hidden;
+    width:375px;height:110px;
+    max-width:60px;max-height:60px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:20px;border:2px solid #fff;
+    background:#eb6200;color:#fff;
+    transition:opacity .3s, max-width .12s ease-in-out, max-height .12s ease-in-out, border-radius .12s;
+    opacity:0;
+  }
+  /* Prev: left-anchored (expands rightward); Next: right-anchored (expands leftward) */
+  .left-arrow-resource-area .resource-arrow-btn{left:10px;}
+  .right-arrow-resource-area .resource-arrow-btn{right:10px;}
+  /* Disabled: gray, no pointer events, still fades in but cannot expand */
+  .resource-arrow-btn[disabled]{background:#d2d2d2;color:#888;pointer-events:none;cursor:not-allowed;}
+  /* Fade in when hovering anywhere on the viewer container (like Lector Live) */
+  .resource-viewer-wrap:hover .resource-arrow-btn{opacity:1;}
+  /* Expand on button hover (only non-disabled) */
+  .resource-arrow-btn:not([disabled]):hover{max-width:375px;max-height:110px;}
+  /* Collapse icon when expanded, reveal preview panel */
+  .resource-arrow-btn > .btn-icon{font-size:30px;transition:opacity .15s;}
+  .resource-arrow-btn:not([disabled]):hover > .btn-icon{display:none;}
+  /* Preview panel — lives inside the button, hidden until expanded */
+  .resource-preview-panel{
+    display:none;
+    width:375px;min-width:375px;height:110px;padding:20px;
+    color:#fff;flex:0 0 auto;
+    flex-direction:row-reverse;justify-content:space-between;align-items:center;
+  }
+  .resource-arrow-btn:not([disabled]):hover .resource-preview-panel{display:flex;}
+  /* Prev: icon on left, text on right */
+  .left-arrow-resource-area .resource-preview-panel{flex-direction:row;}
+  .left-arrow-resource-area .resource-preview-text-info{align-items:flex-end;}
+  .resource-preview-icon{font-size:45px;flex:none;}
+  .resource-preview-text-info{display:flex;flex-direction:column;}
+  .resource-preview-label{font-size:14px;opacity:.5;text-align:start;}
+  .resource-preview-name{font-weight:600;font-size:16px;line-height:26px;text-align:start;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;word-break:break-all;}
+  /* Mobile bottom nav — hidden by default, shown on mobile when viewer is open */
   .inline-content-nav{display:none;justify-content:space-between;align-items:center;margin-top:10px;}
-  body.inline-pdf-open .inline-content-nav,body.inline-video-open .inline-content-nav{display:flex;}
   .inline-content-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:0;background:var(--orange);color:#fff;cursor:pointer;transition:.12s;}
   .inline-content-nav-btn:hover{background:var(--orange-dark);}
   .inline-content-nav-btn:disabled{opacity:.35;cursor:default;pointer-events:none;}
   .inline-content-nav-btn .ui-icon{font-size:15px;}
+  /* Training overlay */
+  .training-overlay{display:none;position:fixed;inset:0;z-index:200;background:#fff;flex-direction:column;}
+  body.training-open .training-overlay{display:flex;}
+  body.training-open .app{display:none;}
+  .training-header{height:50px;flex:none;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;padding:0 14px;gap:14px;}
+  .training-frame{flex:1;border:0;width:100%;background:#f5f5f5;}
+  .training-title{font-size:14px;font-weight:600;color:var(--ink);flex:1;}
   .inline-pdf-frame{width:100%;flex:1;min-height:0;border:0;background:#252525;}
   .inline-video-frame{display:none;width:100%;flex:1;min-height:0;background:#111;object-fit:contain;}
   body.inline-video-open .inline-pdf-frame{display:none;}
@@ -383,6 +425,9 @@
   }
 
   @media (max-width:760px){
+    /* Mobile: hide desktop side arrows, show bottom nav */
+    .left-arrow-resource-area,.right-arrow-resource-area{display:none;}
+    body.inline-pdf-open .inline-content-nav,body.inline-video-open .inline-content-nav{display:flex;}
     .pagehead{padding:14px 14px 0;}
     .trail-summary{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:center;gap:12px 14px;min-height:0;padding:14px;}
     .trail-cover{width:112px;height:66px;}
@@ -510,6 +555,14 @@
               <div class="cc-meta-row"><div class="cc-status approved">Aprovado</div></div>
             </div>
           </div>
+          <div class="conteudo" data-open-training="index.html" role="button" tabindex="0">
+            <div class="ctico" style="background:var(--navy-light)"><i class="ui-icon icon-play ui-navy" aria-hidden="true"></i></div>
+            <div class="cc-mid">
+              <div class="cc-name" title="Conteúdo 2 — Treinamento Skill Suporte Lector">Conteúdo 2 — Treinamento Skill Suporte Lector</div>
+              <div class="cc-type">Treinamento</div>
+              <div class="cc-meta-row"><div class="cc-status not-started">Não iniciado</div></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -623,7 +676,7 @@
       <nav class="crumbs">
         <a>Minha Área</a><span class="sep">›</span>
         <a>Minhas Trilhas</a><span class="sep">›</span>
-        <span class="cur">Conteúdo 2</span>
+        <span class="cur">Conteúdo 1</span>
       </nav>
     </div>
 
@@ -642,18 +695,45 @@
             <h2>Trilha Completa Automação</h2>
           </div>
         </section>
-        <section class="inline-media-reader" aria-label="Conteúdo da trilha">
-          <div class="inline-pdf-head">
-            <strong class="inline-pdf-title" id="inlineMediaTitle">Conteúdo 1</strong>
+        <div class="resource-viewer-wrap">
+          <div class="left-arrow-resource-area">
+            <button class="resource-arrow-btn" id="inlineNavPrev" type="button" aria-label="Conteúdo anterior" disabled>
+              <i class="btn-icon ui-icon icon-left-open" aria-hidden="true"></i>
+              <div class="resource-preview-panel">
+                <i class="resource-preview-icon ui-icon icon-left-open" aria-hidden="true"></i>
+                <div class="resource-preview-text-info">
+                  <div class="resource-preview-label">Conteúdo anterior</div>
+                  <div class="resource-preview-name" id="prevPreviewName">—</div>
+                </div>
+              </div>
+            </button>
           </div>
-          <iframe class="inline-pdf-frame" id="inlinePdfFrame" title="Conteúdo 1"></iframe>
-          <video class="inline-video-frame" id="inlineVideoFrame" controls playsinline></video>
-        </section>
+          <section class="inline-media-reader" aria-label="Conteúdo da trilha">
+            <div class="inline-pdf-head">
+              <strong class="inline-pdf-title" id="inlineMediaTitle">Conteúdo 1</strong>
+            </div>
+            <iframe class="inline-pdf-frame" id="inlinePdfFrame" title="Conteúdo 1"></iframe>
+            <video class="inline-video-frame" id="inlineVideoFrame" controls playsinline></video>
+          </section>
+          <div class="right-arrow-resource-area">
+            <button class="resource-arrow-btn" id="inlineNavNext" type="button" aria-label="Próximo conteúdo">
+              <i class="btn-icon ui-icon icon-right-open" aria-hidden="true"></i>
+              <div class="resource-preview-panel">
+                <i class="resource-preview-icon ui-icon icon-right-open" aria-hidden="true"></i>
+                <div class="resource-preview-text-info">
+                  <div class="resource-preview-label">Próximo conteúdo</div>
+                  <div class="resource-preview-name" id="resourcePreviewName">—</div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <!-- Mobile bottom nav (hidden on desktop via CSS, shown on mobile ≤760px) -->
         <div class="inline-content-nav">
-          <button class="inline-content-nav-btn prev" type="button" id="inlineNavPrev" aria-label="Conteúdo anterior">
+          <button class="inline-content-nav-btn" type="button" id="mobileNavPrev" aria-label="Conteúdo anterior">
             <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
           </button>
-          <button class="inline-content-nav-btn next" type="button" id="inlineNavNext" aria-label="Próximo conteúdo">
+          <button class="inline-content-nav-btn" type="button" id="mobileNavNext" aria-label="Próximo conteúdo">
             <i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
           </button>
         </div>
@@ -754,6 +834,12 @@
   </div>
 </div>
 
+<!-- ===== Training overlay ===== -->
+<div class="training-overlay" id="trainingOverlay" aria-label="Tela de Treinamento">
+  <span class="training-title" id="trainingTitle" style="display:none"></span>
+  <iframe class="training-frame" id="trainingFrame" src="" title="Treinamento" allowfullscreen></iframe>
+</div>
+
 <section class="reader-screen" aria-label="Leitor de PDF">
   <div class="reader-top">
     <button class="reader-back" type="button" id="readerBack" aria-label="Voltar para a trilha">
@@ -795,7 +881,7 @@
   function activate(name){
     tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
     panels.forEach(p=>p.classList.toggle('show', p.dataset.panel===name));
-    try{ localStorage.setItem('lector-trilhaA-tab', name); }catch(e){}
+    try{ localStorage.setItem('lector-trilha-tab', name); }catch(e){}
     if(name==='desempenho') renderChart(currentKey);
   }
   tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
@@ -825,36 +911,29 @@
   if(tabsNextBtn) tabsNextBtn.addEventListener('click', ()=>scrollTabsBy(1));
 
   // ── arrastar com o mouse para rolar as abas (toque já rola nativamente) ──
+  // Nota: NÃO usamos setPointerCapture pois ele faz mouseup/click disparar no
+  // container em vez do .tab filho, quebrando o clique nas abas.
   if(tabsEl){
-    let dragActive = false, dragMoved = false, dragStartX = 0, dragStartScroll = 0, dragStartTime = 0;
-    tabsEl.addEventListener('pointerdown', (e)=>{
-      if(e.pointerType !== 'mouse') return;
+    let dragActive = false, dragMoved = false, dragStartX = 0, dragStartScroll = 0;
+    tabsEl.addEventListener('mousedown', (e)=>{
       dragActive = true; dragMoved = false;
       dragStartX = e.clientX;
       dragStartScroll = tabsEl.scrollLeft;
-      dragStartTime = Date.now();
-      tabsEl.setPointerCapture(e.pointerId);
       tabsEl.classList.add('dragging');
     });
-    tabsEl.addEventListener('pointermove', (e)=>{
+    window.addEventListener('mousemove', (e)=>{
       if(!dragActive) return;
       const dx = e.clientX - dragStartX;
-      // Só conta como arraste se o movimento for real (>18px) E sustentado no tempo
-      // (>120ms); um clique com pequeno tremor do mouse/trackpad é rápido e não deve
-      // ser descartado como se fosse um arraste.
-      if(Math.abs(dx) > 18 && (Date.now() - dragStartTime) > 120) dragMoved = true;
-      tabsEl.scrollLeft = dragStartScroll - dx;
+      if(Math.abs(dx) > 8){
+        dragMoved = true;
+        tabsEl.scrollLeft = dragStartScroll - dx;
+      }
     });
-    function endTabsDrag(){
-      if(!dragActive) return;
-      dragActive = false;
-      tabsEl.classList.remove('dragging');
-    }
-    tabsEl.addEventListener('pointerup', endTabsDrag);
-    tabsEl.addEventListener('pointercancel', endTabsDrag);
-    tabsEl.addEventListener('pointerleave', endTabsDrag);
+    function endTabsDrag(){ dragActive = false; tabsEl.classList.remove('dragging'); }
+    window.addEventListener('mouseup', endTabsDrag);
+    // Intercepta clique após arraste real para não trocar de aba
     tabsEl.addEventListener('click', (e)=>{
-      if(dragMoved){ e.stopPropagation(); dragMoved = false; }
+      if(dragMoved){ e.stopPropagation(); e.preventDefault(); dragMoved = false; }
     }, true);
   }
 
@@ -947,13 +1026,29 @@
     }, 1400);
   }
   // ── navegação anterior/próximo conteúdo ──
-  const navItems = Array.from(document.querySelectorAll('.conteudo[data-open-pdf], .conteudo[data-open-video]'));
+  const navItems = Array.from(document.querySelectorAll('.conteudo[data-open-pdf], .conteudo[data-open-video], .conteudo[data-open-training], .conteudo[data-open-avaliacao]'));
   let currentContentIndex = -1;
   const inlineNavPrev = document.getElementById('inlineNavPrev');
   const inlineNavNext = document.getElementById('inlineNavNext');
+  const resourcePreviewName = document.getElementById('resourcePreviewName');
+  const prevPreviewName = document.getElementById('prevPreviewName');
+  const mobileNavPrev = document.getElementById('mobileNavPrev');
+  const mobileNavNext = document.getElementById('mobileNavNext');
   function updateNavButtons(){
-    inlineNavPrev.disabled = currentContentIndex <= 0;
-    inlineNavNext.disabled = currentContentIndex < 0 || currentContentIndex >= navItems.length - 1;
+    const atStart = currentContentIndex <= 0;
+    const atEnd = currentContentIndex < 0 || currentContentIndex >= navItems.length - 1;
+    inlineNavPrev.disabled = atStart;
+    inlineNavNext.disabled = atEnd;
+    if(mobileNavPrev) mobileNavPrev.disabled = atStart;
+    if(mobileNavNext) mobileNavNext.disabled = atEnd;
+    if(resourcePreviewName){
+      const nextItem = navItems[currentContentIndex + 1];
+      resourcePreviewName.textContent = nextItem ? (nextItem.querySelector('.cc-name')?.textContent.trim() || '—') : '—';
+    }
+    if(prevPreviewName){
+      const prevItem = navItems[currentContentIndex - 1];
+      prevPreviewName.textContent = prevItem ? (prevItem.querySelector('.cc-name')?.textContent.trim() || '—') : '—';
+    }
   }
   function openContentByIndex(i){
     const item = navItems[i];
@@ -962,10 +1057,34 @@
     const title = item.querySelector('.cc-name')?.textContent.trim();
     if(item.dataset.openPdf) openInlinePdf(item.dataset.openPdf, title);
     else if(item.dataset.openVideo) openInlineVideo(item.dataset.openVideo, title);
+    else if(item.dataset.openTraining){ document.body.classList.remove('training-open'); openTraining(item.dataset.openTraining, title); }
+    else if(item.dataset.openAvaliacao){ document.body.classList.remove('training-open'); openTraining(item.dataset.openAvaliacao, title); }
     updateNavButtons();
+    updateTrainingNav();
   }
   inlineNavPrev.addEventListener('click',()=>openContentByIndex(currentContentIndex-1));
   inlineNavNext.addEventListener('click',()=>openContentByIndex(currentContentIndex+1));
+  if(mobileNavPrev) mobileNavPrev.addEventListener('click',()=>openContentByIndex(currentContentIndex-1));
+  if(mobileNavNext) mobileNavNext.addEventListener('click',()=>openContentByIndex(currentContentIndex+1));
+  // ── Training overlay ──
+  const trainingFrame = document.getElementById('trainingFrame');
+  const trainingTitle = document.getElementById('trainingTitle');
+  const closeTrainingBtn = document.getElementById('closeTrainingBtn');
+  function updateTrainingNav(){}
+  function openTraining(src, title){
+    trainingTitle.textContent = title || 'Treinamento';
+    // Publicado no window para o iframe ler: servidores com "clean URLs" descartam
+    // a query string no redirect, então não dá para passar o título pela URL.
+    window.trainingTitleForFrame = title || 'Treinamento';
+    trainingFrame.src = src;
+    document.body.classList.add('training-open');
+  }
+  function closeTraining(){
+    document.body.classList.remove('training-open');
+    trainingFrame.src = '';
+  }
+  window.closeTraining = closeTraining;
+  if(closeTrainingBtn) closeTrainingBtn.addEventListener('click', closeTraining);
 
   document.querySelectorAll('[data-open-pdf], [data-open-video]').forEach(item=>{
     item.addEventListener('click',()=>openContentByIndex(navItems.indexOf(item)));
@@ -976,18 +1095,30 @@
       }
     });
   });
+  document.querySelectorAll('[data-open-training]').forEach(item=>{
+    item.addEventListener('click',()=>{
+      const src = item.dataset.openTraining;
+      const title = item.querySelector('.cc-name')?.textContent.trim() || 'Treinamento';
+      openTraining(src, title);
+    });
+  });
   readerBack.addEventListener('click', closePdfReader);
   sideFinish.addEventListener('click', openCertificateFlow);
   certificateClose.addEventListener('click', closeCertificateModal);
 
   // ── avaliações: abrem em nova guia ──
   document.querySelectorAll('[data-open-avaliacao]').forEach(item=>{
-    function trigger(){ window.open(item.dataset.openAvaliacao, '_blank'); }
-    item.addEventListener('click', trigger);
+    item.addEventListener('click',()=>{
+      const src = item.dataset.openAvaliacao;
+      const title = item.querySelector('.cc-name')?.textContent.trim() || 'Avaliação';
+      openTraining(src, title);
+    });
     item.addEventListener('keydown',e=>{
       if(e.key === 'Enter' || e.key === ' '){
         e.preventDefault();
-        trigger();
+        const src = item.dataset.openAvaliacao;
+        const title = item.querySelector('.cc-name')?.textContent.trim() || 'Avaliação';
+        openTraining(src, title);
       }
     });
   });
@@ -1104,27 +1235,7 @@
     });
   });
   activate('descricao');
-</script>
-<script>
-(function(){
-  var MOBILE_W = 420;
-  if (window.top !== window.self) return;
-  if (new URLSearchParams(location.search).get('mv') === '1') return;
-  if (window.innerWidth <= MOBILE_W) return;
-  var url = new URL(location.href);
-  url.searchParams.set('mv','1');
-  document.body.removeAttribute('class');
-  document.body.innerHTML = '';
-  document.body.style.cssText = 'margin:0;min-height:100vh;display:flex;justify-content:center;background:#e5e5e5;';
-  var frame = document.createElement('iframe');
-  frame.src = url.toString();
-  frame.title = document.title;
-  frame.style.cssText = 'border:0;width:'+MOBILE_W+'px;max-width:100vw;height:100vh;background:#fff;';
-  document.body.appendChild(frame);
-  var hideStyle = document.getElementById('mv-hide');
-  if (hideStyle) hideStyle.remove();
-  document.documentElement.style.visibility = '';
-})();
+  openContentByIndex(0);
 </script>
 </body>
 </html>

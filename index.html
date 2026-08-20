@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<script>
-(function(){
-  var MOBILE_W = 420;
-  if (window.top === window.self && window.innerWidth > MOBILE_W && new URLSearchParams(location.search).get('mv') !== '1') {
-    document.write('<style id="mv-hide">html{visibility:hidden!important;}</style>');
-  }
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Treinamento Skill Suporte Lector — Conteúdo 2</title>
@@ -141,6 +133,7 @@
   /* ───── Main column ───── */
   .main{flex:1;display:flex;flex-direction:column;min-width:0;}
   .topbar{height:56px;flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid var(--n300);background:#fff;}
+  .topbar-training-title{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .btn-accent{width:38px;height:38px;border-radius:50%;border:none;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:.12s;box-shadow:0 2px 6px rgba(232,119,34,.32);padding:0;}
   .btn-accent:hover{background:var(--orange-dark);}
   .btn-accent.center.middle{align-items:center;justify-content:center;}
@@ -163,13 +156,35 @@
   .trail-cover img{display:block;width:100%;height:100%;object-fit:cover;}
   .trail-copy{min-width:0;flex:1;}
   .trail-copy h2{font-size:22px;font-weight:700;margin:0;color:#111;line-height:1.2;}
-  .inline-media-reader{display:none;height:clamp(520px,calc(100vh - 150px),820px);min-height:0;background:#252525;border:1px solid #dcdcdc;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.14);overflow:hidden;flex-direction:column;}
   body.inline-pdf-open .trail-summary,body.inline-video-open .trail-summary{display:none;}
-  body.inline-pdf-open .inline-media-reader,body.inline-video-open .inline-media-reader{display:flex;}
+  body.inline-pdf-open .inline-media-reader,body.inline-video-open .inline-media-reader{display:flex;flex:1;min-width:0;}
   .inline-pdf-head{height:44px;flex:none;background:#fff;border-bottom:1px solid var(--n300);display:flex;align-items:center;padding:0 16px;}
   .inline-pdf-title{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .inline-reader-back{display:none;align-items:center;justify-content:center;width:32px;height:32px;margin:0 8px 0 -6px;border:0;border-radius:50%;background:transparent;color:var(--orange);font-size:16px;cursor:pointer;}
+  .inline-reader-back:hover{background:var(--orange-subtle);}
+  /* resource-viewer lateral nav (Lector Live style) */
+  .resource-viewer-wrap{display:none;align-items:stretch;}
+  body.inline-pdf-open .resource-viewer-wrap,body.inline-video-open .resource-viewer-wrap{display:flex;}
+  .inline-media-reader{display:none;height:clamp(520px,calc(100vh - 150px),820px);min-height:0;background:#252525;border:1px solid #dcdcdc;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.14);overflow:hidden;flex-direction:column;}
+  .left-arrow-resource-area,.right-arrow-resource-area{flex:none;width:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:visible;z-index:20;}
+  .resource-arrow-btn{cursor:pointer;position:absolute;overflow:hidden;width:375px;height:110px;max-width:60px;max-height:60px;display:flex;align-items:center;justify-content:center;border-radius:20px;border:2px solid #fff;background:#eb6200;color:#fff;transition:opacity .3s, max-width .12s ease-in-out, max-height .12s ease-in-out, border-radius .12s;opacity:0;}
+  .left-arrow-resource-area .resource-arrow-btn{left:10px;}
+  .right-arrow-resource-area .resource-arrow-btn{right:10px;}
+  .resource-arrow-btn[disabled]{background:#d2d2d2;color:#888;pointer-events:none;}
+  .resource-viewer-wrap:hover .resource-arrow-btn{opacity:1;}
+  .resource-arrow-btn:not([disabled]):hover{max-width:375px;max-height:110px;}
+  .resource-arrow-btn > .btn-icon{font-size:30px;}
+  .resource-arrow-btn:not([disabled]):hover > .btn-icon{display:none;}
+  .resource-preview-panel{display:none;width:375px;min-width:375px;height:110px;padding:20px;color:#fff;flex:0 0 auto;flex-direction:row-reverse;justify-content:space-between;align-items:center;}
+  .resource-arrow-btn:not([disabled]):hover .resource-preview-panel{display:flex;}
+  .left-arrow-resource-area .resource-preview-panel{flex-direction:row;}
+  .left-arrow-resource-area .resource-preview-text-info{align-items:flex-end;}
+  .resource-preview-icon{font-size:45px;flex:none;}
+  .resource-preview-text-info{display:flex;flex-direction:column;}
+  .resource-preview-label{font-size:14px;opacity:.5;text-align:start;}
+  .resource-preview-name{font-weight:600;font-size:16px;line-height:26px;text-align:start;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;word-break:break-all;}
+  /* Mobile bottom nav */
   .inline-content-nav{display:none;justify-content:space-between;align-items:center;margin-top:10px;}
-  body.inline-pdf-open .inline-content-nav,body.inline-video-open .inline-content-nav{display:flex;}
   .inline-content-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:0;background:var(--orange);color:#fff;cursor:pointer;transition:.12s;}
   .inline-content-nav-btn:hover{background:var(--orange-dark);}
   .inline-content-nav-btn:disabled{opacity:.35;cursor:default;pointer-events:none;}
@@ -178,6 +193,12 @@
   .inline-video-frame{display:none;width:100%;flex:1;min-height:0;background:#111;object-fit:contain;}
   body.inline-video-open .inline-pdf-frame{display:none;}
   body.inline-video-open .inline-video-frame{display:block;}
+  .inline-avaliacao-frame{display:none;width:100%;flex:1;min-height:0;border:0;background:#fff;}
+  body.inline-avaliacao-open .inline-pdf-frame{display:none;}
+  body.inline-avaliacao-open .inline-avaliacao-frame{display:block;}
+  body.inline-avaliacao-open .resource-viewer-wrap{display:flex;}
+  body.inline-avaliacao-open .trail-summary{display:none;}
+  body.inline-avaliacao-open .inline-media-reader{display:flex;flex:1;min-height:0;}
   .tabs-wrap{position:relative;}
   .tabs{display:flex;border-bottom:1px solid var(--n300);padding:0 32px;margin-top:0;position:sticky;top:0;background:#fff;z-index:10;}
   .tab{padding:11px 0;margin-right:28px;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:color .12s;white-space:nowrap;}
@@ -511,6 +532,20 @@
     .pagehead{display:none;}
     body.inline-pdf-open .pagehead,body.inline-video-open .pagehead{display:block;padding:10px 10px 0;}
     .inline-media-reader{height:calc(100vh - 72px);min-height:480px;}
+
+    /* No mobile a avaliação abre em tela cheia — o quadro do leitor inline é
+       pequeno demais para responder questões. A barra de anterior/próximo do
+       treinamento fica flutuando por cima e continua navegando pelas questões. */
+    body.inline-avaliacao-open .pagehead{display:block;padding:0;}
+    body.inline-avaliacao-open .resource-viewer-wrap{position:fixed;inset:0;z-index:120;display:block;}
+    body.inline-avaliacao-open .inline-media-reader{height:100%;min-height:0;border:0;border-radius:0;box-shadow:none;background:#fff;}
+    body.inline-avaliacao-open .inline-pdf-head{flex:none;height:48px;}
+    body.inline-avaliacao-open .inline-reader-back{display:inline-flex;}
+    body.inline-avaliacao-open .topbar,
+    body.inline-avaliacao-open .tabs-wrap,
+    body.inline-avaliacao-open .panel,
+    body.inline-avaliacao-open .sidebar-toggle{display:none;}
+    body.inline-avaliacao-open .inline-content-nav{position:fixed;left:0;right:0;bottom:0;z-index:121;display:flex;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--n300);}
     .scroll{overflow:visible;}
     .tabs{top:56px;overflow-x:auto;scrollbar-width:none;}
     .tabs::-webkit-scrollbar{display:none;}
@@ -520,6 +555,8 @@
   }
 
   @media (max-width:760px){
+    .left-arrow-resource-area,.right-arrow-resource-area{display:none;}
+    body.inline-pdf-open .inline-content-nav,body.inline-video-open .inline-content-nav,body.inline-avaliacao-open .inline-content-nav{display:flex;}
     .pagehead{padding:14px 14px 0;}
     .trail-summary{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:center;gap:12px 14px;min-height:0;padding:14px;}
     .trail-cover{width:112px;height:66px;}
@@ -612,9 +649,9 @@
       </div>
     </div>
 
-    <button class="side-mobile-back" type="button" aria-label="Voltar">
+    <button class="side-mobile-back" type="button" id="sideMobileBack" aria-label="Voltar para a Trilha">
       <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
-      <span>Voltar</span>
+      <span>Voltar para a Trilha</span>
     </button>
 
     <div class="conteudos">
@@ -645,19 +682,19 @@
               <div class="cc-meta-row"><div class="cc-status progress">Em andamento</div></div>
             </div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-png ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="Acesso e navegação na Minha Área">Acesso e navegação na Minha Área</div><div class="cc-type">Documento</div><div class="cc-status muted">Não visualizado</div></div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="Gestão de usuários e permissões">Gestão de usuários e permissões</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
             <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="Configurações essenciais da plataforma">Configurações essenciais da plataforma</div><div class="cc-type">Documento</div><div class="cc-status muted">Não visualizado</div></div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-avaliacao="avaliacao.html" role="button" tabindex="0">
             <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-file-xls ui-warn" aria-hidden="true"></i></div>
             <div class="cc-mid">
               <div class="cc-try">Tentativa 1/2</div>
@@ -670,7 +707,7 @@
               <div class="cc-meta-row"><div class="cc-status failed">Reprovado</div></div>
             </div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-avaliacao="avaliacao.html" role="button" tabindex="0">
             <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
             <div class="cc-mid">
               <div class="cc-try">Tentativa 1/1</div>
@@ -678,7 +715,7 @@
               <div class="cc-name" title="Avaliação — Registro e classificação de chamados">Avaliação — Registro e classificação de chamados</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
             </div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-avaliacao="avaliacao.html" role="button" tabindex="0">
             <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
             <div class="cc-mid">
               <div class="cc-try">Tentativa 1/1</div>
@@ -686,7 +723,7 @@
               <div class="cc-name" title="Avaliação — Diagnóstico de problemas frequentes">Avaliação — Diagnóstico de problemas frequentes</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
             </div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-avaliacao="avaliacao.html" role="button" tabindex="0">
             <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
             <div class="cc-mid">
               <div class="cc-try">Tentativa 1/1</div>
@@ -694,7 +731,7 @@
               <div class="cc-name" title="Avaliação — Comunicação com o cliente">Avaliação — Comunicação com o cliente</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
             </div>
           </div>
-          <div class="conteudo">
+          <div class="conteudo" data-open-avaliacao="avaliacao.html" role="button" tabindex="0">
             <div class="ctico" style="background:var(--warn-light)"><i class="ui-icon icon-questions ui-warn" aria-hidden="true"></i></div>
             <div class="cc-mid">
               <div class="cc-try">Tentativa 1/1</div>
@@ -702,12 +739,12 @@
               <div class="cc-name" title="Avaliação — Escalonamento e resolução de chamados">Avaliação — Escalonamento e resolução de chamados</div><div class="cc-type">Avaliação</div><div class="cc-status approved">Aprovado</div>
             </div>
           </div>
-          <div class="conteudo">
-            <div class="ctico"></div>
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
+            <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="Boas práticas no atendimento Lector">Boas práticas no atendimento Lector</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
           </div>
-          <div class="conteudo">
-            <div class="ctico"></div>
+          <div class="conteudo" data-open-pdf="uploads/manual-minha-area.pdf" role="button" tabindex="0">
+            <div class="ctico" style="background:var(--teal-light)"><i class="ui-icon icon-pdf ui-teal" aria-hidden="true"></i></div>
             <div class="cc-mid"><div class="cc-name" title="Base de conhecimento do Suporte Lector">Base de conhecimento do Suporte Lector</div><div class="cc-type">Documento</div><div class="cc-status muted">Não iniciado</div></div>
           </div>
       </div>
@@ -717,20 +754,14 @@
   <!-- ───────── MAIN ───────── -->
   <div class="main">
     <div class="topbar">
-      <button id="hideResource" ng-if="!showFinishtrail()" ng-click="hideResource()" class="btn-accent icon-undo center middle ng-scope" title="Voltar" aria-label="Voltar"></button>
-      <nav class="crumbs">
-        <a>Minha Área</a><span class="sep">›</span>
-        <a>Meus Treinamentos</a><span class="sep">›</span>
-        <span class="cur">Conteúdo 2</span>
-      </nav>
+      <button class="reader-back" type="button" id="topbarVoltarTrilha" style="display:none" aria-label="Voltar para a trilha">
+        <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
+        Voltar para a Trilha
+      </button>
+      <span class="topbar-training-title" id="topbarTrainingTitle"></span>
     </div>
 
     <div class="scroll">
-      <nav class="mobile-crumbs" aria-label="Caminho de navegação">
-        <a>Minha Área</a><span class="sep">›</span>
-        <a>Meus Treinamentos</a><span class="sep">›</span>
-        <span class="cur">Nome Treinamento</span>
-      </nav>
       <div class="pagehead">
         <section class="trail-summary" aria-label="Resumo do treinamento">
           <figure class="trail-cover">
@@ -740,18 +771,49 @@
             <h2>Treinamento Skill Suporte Lector</h2>
           </div>
         </section>
-        <section class="inline-media-reader" aria-label="Conteúdo do treinamento">
-          <div class="inline-pdf-head">
-            <strong class="inline-pdf-title" id="inlineMediaTitle">Boas-vindas ao Suporte Lector</strong>
+        <div class="resource-viewer-wrap">
+          <div class="left-arrow-resource-area">
+            <button class="resource-arrow-btn" id="inlineNavPrev" type="button" aria-label="Conteúdo anterior" disabled>
+              <i class="btn-icon ui-icon icon-left-open" aria-hidden="true"></i>
+              <div class="resource-preview-panel">
+                <i class="resource-preview-icon ui-icon icon-left-open" aria-hidden="true"></i>
+                <div class="resource-preview-text-info">
+                  <div class="resource-preview-label">Conteúdo anterior</div>
+                  <div class="resource-preview-name" id="prevPreviewName">—</div>
+                </div>
+              </div>
+            </button>
           </div>
-          <iframe class="inline-pdf-frame" id="inlinePdfFrame" title="Boas-vindas ao Suporte Lector"></iframe>
-          <video class="inline-video-frame" id="inlineVideoFrame" controls playsinline></video>
-        </section>
+          <section class="inline-media-reader" aria-label="Conteúdo do treinamento">
+            <div class="inline-pdf-head">
+              <button class="inline-reader-back" type="button" id="inlineReaderBack" aria-label="Voltar para os conteúdos">
+                <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
+              </button>
+              <strong class="inline-pdf-title" id="inlineMediaTitle">Boas-vindas ao Suporte Lector</strong>
+            </div>
+            <iframe class="inline-pdf-frame" id="inlinePdfFrame" title="Boas-vindas ao Suporte Lector"></iframe>
+            <video class="inline-video-frame" id="inlineVideoFrame" controls playsinline></video>
+            <iframe class="inline-avaliacao-frame" id="inlineAvaliacaoFrame" title="Avaliação"></iframe>
+          </section>
+          <div class="right-arrow-resource-area">
+            <button class="resource-arrow-btn" id="inlineNavNext" type="button" aria-label="Próximo conteúdo">
+              <i class="btn-icon ui-icon icon-right-open" aria-hidden="true"></i>
+              <div class="resource-preview-panel">
+                <i class="resource-preview-icon ui-icon icon-right-open" aria-hidden="true"></i>
+                <div class="resource-preview-text-info">
+                  <div class="resource-preview-label">Próximo conteúdo</div>
+                  <div class="resource-preview-name" id="resourcePreviewName">—</div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <!-- Mobile bottom nav -->
         <div class="inline-content-nav">
-          <button class="inline-content-nav-btn prev" type="button" id="inlineNavPrev" aria-label="Conteúdo anterior">
+          <button class="inline-content-nav-btn" type="button" id="mobileNavPrev" aria-label="Conteúdo anterior">
             <i class="ui-icon icon-arrow-left" aria-hidden="true"></i>
           </button>
-          <button class="inline-content-nav-btn next" type="button" id="inlineNavNext" aria-label="Próximo conteúdo">
+          <button class="inline-content-nav-btn" type="button" id="mobileNavNext" aria-label="Próximo conteúdo">
             <i class="ui-icon icon-arrow-right" aria-hidden="true"></i>
           </button>
         </div>
@@ -1049,7 +1111,7 @@
   function activate(name){
     tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
     panels.forEach(p=>p.classList.toggle('show', p.dataset.panel===name));
-    try{ localStorage.setItem('lector-trilhaA-tab', name); }catch(e){}
+    try{ localStorage.setItem('lector-treinamento-tab', name); }catch(e){}
     if(name==='desempenho') renderChart();
   }
   tabs.forEach(t=>t.addEventListener('click',()=>activate(t.dataset.tab)));
@@ -1135,12 +1197,25 @@
     }
     inlineVideoFrame.play().catch(()=>{});
   }
+  const inlineAvaliacaoFrame = document.getElementById('inlineAvaliacaoFrame');
+  function openInlineAvaliacao(src, title){
+    closeInlineMedia();
+    inlineMediaTitle.textContent = title || 'Avaliação';
+    inlineAvaliacaoFrame.src = src;
+    document.body.classList.add('inline-avaliacao-open');
+    document.querySelector('.scroll').scrollTop = 0;
+    if(window.matchMedia('(max-width:900px)').matches){
+      document.body.classList.add('sidebar-collapsed');
+    }
+  }
+  window.closeInlineMedia = closeInlineMedia;
   function closeInlineMedia(){
-    document.body.classList.remove('inline-pdf-open','inline-video-open');
+    document.body.classList.remove('inline-pdf-open','inline-video-open','inline-avaliacao-open');
     inlinePdfFrame.src = 'about:blank';
     inlineVideoFrame.pause();
     inlineVideoFrame.removeAttribute('src');
     inlineVideoFrame.load();
+    if(inlineAvaliacaoFrame) inlineAvaliacaoFrame.src = 'about:blank';
   }
   function openVideoReader(src){
     closeInlineMedia();
@@ -1166,13 +1241,59 @@
     }, 1400);
   }
   // ── navegação anterior/próximo conteúdo ──
-  const navItems = Array.from(document.querySelectorAll('.conteudo[data-open-pdf], .conteudo[data-open-video]'));
+  const navItems = Array.from(document.querySelectorAll('.conteudo[data-open-pdf], .conteudo[data-open-video], .conteudo[data-open-avaliacao]'));
   let currentContentIndex = -1;
   const inlineNavPrev = document.getElementById('inlineNavPrev');
   const inlineNavNext = document.getElementById('inlineNavNext');
+  const mobileNavPrev = document.getElementById('mobileNavPrev');
+  const mobileNavNext = document.getElementById('mobileNavNext');
+  const resourcePreviewName = document.getElementById('resourcePreviewName');
+  const prevPreviewName = document.getElementById('prevPreviewName');
+  // Com uma avaliação aberta, as mesmas setas de anterior/próximo passam a
+  // navegar pelas questões dela em vez de trocar de conteúdo.
+  function quizApi(){
+    if(!document.body.classList.contains('inline-avaliacao-open')) return null;
+    try{
+      const api = inlineAvaliacaoFrame.contentWindow.quizNav;
+      return (api && api.isActive()) ? api : null;
+    }catch(e){ return null; }
+  }
   function updateNavButtons(){
-    inlineNavPrev.disabled = currentContentIndex <= 0;
-    inlineNavNext.disabled = currentContentIndex < 0 || currentContentIndex >= navItems.length - 1;
+    const quiz = quizApi();
+    const contentAtStart = currentContentIndex <= 0;
+    const contentAtEnd = currentContentIndex < 0 || currentContentIndex >= navItems.length - 1;
+    // No quiz: "anterior" volta uma questão (ou sai para o conteúdo anterior na 1ª)
+    // e "próximo" só libera depois de responder.
+    const atStart = quiz ? (!quiz.canPrev() && contentAtStart) : contentAtStart;
+    const atEnd = quiz ? !quiz.canNext() : contentAtEnd;
+    inlineNavPrev.disabled = atStart;
+    inlineNavNext.disabled = atEnd;
+    if(mobileNavPrev) mobileNavPrev.disabled = atStart;
+    if(mobileNavNext) mobileNavNext.disabled = atEnd;
+    if(resourcePreviewName){
+      const nextItem = navItems[currentContentIndex + 1];
+      resourcePreviewName.textContent = quiz
+        ? quiz.nextLabel()
+        : (nextItem?.querySelector('.cc-name')?.textContent.trim() || '—');
+    }
+    if(prevPreviewName){
+      const prevItem = navItems[currentContentIndex - 1];
+      prevPreviewName.textContent = (quiz && quiz.canPrev())
+        ? quiz.prevLabel()
+        : (prevItem?.querySelector('.cc-name')?.textContent.trim() || '—');
+    }
+  }
+  // Chamado pela avaliação embutida sempre que o estado dela muda.
+  window.syncQuizNav = updateNavButtons;
+  function goPrevContent(){
+    const quiz = quizApi();
+    if(quiz && quiz.canPrev()){ quiz.prev(); return; }
+    openContentByIndex(currentContentIndex - 1);
+  }
+  function goNextContent(){
+    const quiz = quizApi();
+    if(quiz){ if(quiz.canNext()) quiz.next(); return; }
+    openContentByIndex(currentContentIndex + 1);
   }
   function openContentByIndex(i){
     const item = navItems[i];
@@ -1181,12 +1302,17 @@
     const title = item.querySelector('.cc-name')?.textContent.trim();
     if(item.dataset.openPdf) openInlinePdf(item.dataset.openPdf, title);
     else if(item.dataset.openVideo) openInlineVideo(item.dataset.openVideo, title);
+    else if(item.dataset.openAvaliacao) openInlineAvaliacao(item.dataset.openAvaliacao, title);
     updateNavButtons();
   }
-  inlineNavPrev.addEventListener('click',()=>openContentByIndex(currentContentIndex-1));
-  inlineNavNext.addEventListener('click',()=>openContentByIndex(currentContentIndex+1));
+  const inlineReaderBack = document.getElementById('inlineReaderBack');
+  if(inlineReaderBack) inlineReaderBack.addEventListener('click', closeInlineMedia);
+  inlineNavPrev.addEventListener('click', goPrevContent);
+  inlineNavNext.addEventListener('click', goNextContent);
+  if(mobileNavPrev) mobileNavPrev.addEventListener('click', goPrevContent);
+  if(mobileNavNext) mobileNavNext.addEventListener('click', goNextContent);
 
-  document.querySelectorAll('[data-open-pdf], [data-open-video]').forEach(item=>{
+  document.querySelectorAll('[data-open-pdf], [data-open-video], [data-open-avaliacao]').forEach(item=>{
     item.addEventListener('click',()=>openContentByIndex(navItems.indexOf(item)));
     item.addEventListener('keydown',e=>{
       if(e.key === 'Enter' || e.key === ' '){
@@ -1197,6 +1323,30 @@
   });
   readerBack.addEventListener('click', closePdfReader);
   certificateClose.addEventListener('click', closeCertificateModal);
+  // Treinamento aberto pela trilha: o pai (trilha.html) expõe closeTraining.
+  // Detectamos pelo pai em vez da query string porque servidores com "clean URLs"
+  // redirecionam /index.html?x → /index e descartam a query.
+  const abertoPelaTrilha = (()=>{
+    try{ return window !== window.top && typeof window.parent.closeTraining === 'function'; }
+    catch(e){ return false; }
+  })();
+  const topbarTrainingTitle = document.getElementById('topbarTrainingTitle');
+  const topbarVoltarTrilha = document.getElementById('topbarVoltarTrilha');
+  if(abertoPelaTrilha){
+    const titulo = window.parent.trainingTitleForFrame
+      || new URLSearchParams(location.search).get('trainingtitle');
+    if(topbarTrainingTitle && titulo) topbarTrainingTitle.textContent = titulo;
+    if(topbarVoltarTrilha){
+      topbarVoltarTrilha.style.display = '';
+      topbarVoltarTrilha.addEventListener('click', ()=>window.parent.closeTraining());
+    }
+  }
+  const sideMobileBack = document.getElementById('sideMobileBack');
+  if(sideMobileBack) sideMobileBack.addEventListener('click', ()=>{
+    if(window !== window.top && typeof window.parent.closeTraining === 'function'){
+      window.parent.closeTraining();
+    }
+  });
 
   // ── chart data ──
   const CONTENT_VALUES = [100,100,0,0,0,20,100,100,100,100,0,0];
@@ -1574,31 +1724,13 @@
       }
     });
   });
+  // A aba salva so vale se ainda existir nesta tela — caso contrario nenhuma aba
+  // ficaria ativa e o painel de conteudo abriria vazio.
   let saved='descricao';
-  try{ saved = localStorage.getItem('lector-trilhaA-tab') || 'descricao'; }catch(e){}
+  try{ saved = localStorage.getItem('lector-treinamento-tab') || 'descricao'; }catch(e){}
+  if(![...tabs].some(t=>t.dataset.tab===saved)) saved='descricao';
   activate(saved);
   openContentByIndex(0);
-</script>
-<script>
-(function(){
-  var MOBILE_W = 420;
-  if (window.top !== window.self) return;
-  if (new URLSearchParams(location.search).get('mv') === '1') return;
-  if (window.innerWidth <= MOBILE_W) return;
-  var url = new URL(location.href);
-  url.searchParams.set('mv','1');
-  document.body.removeAttribute('class');
-  document.body.innerHTML = '';
-  document.body.style.cssText = 'margin:0;min-height:100vh;display:flex;justify-content:center;background:#e5e5e5;';
-  var frame = document.createElement('iframe');
-  frame.src = url.toString();
-  frame.title = document.title;
-  frame.style.cssText = 'border:0;width:'+MOBILE_W+'px;max-width:100vw;height:100vh;background:#fff;';
-  document.body.appendChild(frame);
-  var hideStyle = document.getElementById('mv-hide');
-  if (hideStyle) hideStyle.remove();
-  document.documentElement.style.visibility = '';
-})();
 </script>
 </body>
 </html>
